@@ -51,16 +51,24 @@ Open `index.html` in your browser, or use a local development server such as VS 
 
 ## Contributing
 
-Contributions from team members are welcome.
+We welcome contributions from all team members.
+
+### Branches
+
+- `main` — stable, release-ready code
+- `develop` — development and integration branch
+- `feature/*` — individual feature development
+- `fix/*` — bug fixes
 
 ### Workflow
 
-1. Pull the latest changes from `main`.
+1. Pull the latest changes from `develop`.
 2. Create a branch for your work.
 3. Make and test your changes.
 4. Commit and push your branch.
-5. Open a Pull Request into `main`.
+5. Open a Pull Request into `develop`.
 6. Have your changes reviewed before merging.
+7. Once `develop` is stable, it will be merged into `main`.
 
 ### Branch Naming
 
@@ -68,7 +76,6 @@ Use:
 
 ```text
 type/short-description
-```
 
 Examples:
 
