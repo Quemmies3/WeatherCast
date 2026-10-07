@@ -10,10 +10,68 @@
 
 <body>
 
-  <main>
-    <h1>WeatherCast</h1>
-  </main>
+    <header class="header">
 
-  <script src="js/app.js"></script>
+        <div class="logo">
+            WeatherCast
+        </div>
+
+        <form id="search-form">
+            <input
+                id="city-input"
+                type="search"
+                placeholder="Search city..."
+            />
+
+            <button type="submit">
+                Search
+            </button>
+        </form>
+
+        <div class="unit-toggle">
+            <button id="celsius-btn">°C</button>
+            <button id="fahrenheit-btn">°F</button>
+        </div>
+    </header>
+
+
+
+    <main>
+
+        <section id="current-weather">
+            <!-- Current weather -->
+              Search for a city to see the weather.
+        </section>
+
+        <section id="forecast">
+            <!-- 5-day forecast -->
+            <div class="forecast-card">--</div>
+            <div class="forecast-card">--</div>
+            <div class="forecast-card">--</div>
+            <div class="forecast-card">--</div>
+            <div class="forecast-card">--</div>
+        </section>
+
+        <section id="recent-searches">
+            <!-- Recent searches -->
+             <h2>Recent Searches</h2>
+        </section>
+
+    
+
+        <div id="loading" hidden>
+            Loading...
+        </div>
+
+        <div id="error" hidden>
+            <!-- Error message -->
+        </div>
+
+    </main>
+
+
+
+
+      <script type="module"  src="js/app.js"></script>
 </body>
 </html>
