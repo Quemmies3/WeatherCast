@@ -1,1 +1,302 @@
 /* WeatherCast styles */
+/* =========================
+   Base
+========================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    background: #0f0f12;
+    color: #f5f5f5;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 24px;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+
+/* =========================
+   Header
+========================= */
+
+.header {
+    max-width: 1200px;
+    margin: 0 auto 32px;
+
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+#search-form {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+}
+
+#city-input {
+    width: 100%;
+    padding: 12px 16px;
+
+    border: 1px solid #33343a;
+    border-radius: 10px;
+
+    background: #1b1b1f;
+    color: #fff;
+    outline: none;
+}
+
+#city-input::placeholder {
+    color: #8d8d94;
+}
+
+#city-input:focus {
+    border-color: #6fa8dc;
+}
+
+#search-form button {
+    padding: 12px 20px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #b8d5ea;
+    color: #111;
+
+    cursor: pointer;
+    font-weight: 600;
+}
+
+#search-form button:hover {
+    background: #c9e1f2;
+}
+
+
+/* =========================
+   Temperature Toggle
+========================= */
+
+.unit-toggle {
+    display: flex;
+    gap: 4px;
+
+    padding: 4px;
+    border-radius: 10px;
+
+    background: #1b1b1f;
+}
+
+.unit-toggle button {
+    padding: 8px 12px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: transparent;
+    color: #aaa;
+
+    cursor: pointer;
+}
+
+.unit-toggle button:hover {
+    color: #fff;
+}
+
+.unit-toggle button.active {
+    background: #b8d5ea;
+    color: #111;
+}
+
+
+/* =========================
+   Main
+========================= */
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+/* =========================
+   Current Weather
+========================= */
+
+#current-weather {
+    min-height: 240px;
+
+    margin-bottom: 28px;
+    padding: 28px;
+
+    border-radius: 18px;
+
+    background: #1b1b1f;
+    border: 1px solid #29292f;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #888;
+}
+
+
+/* =========================
+   Forecast
+========================= */
+
+#forecast {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+
+    margin-bottom: 28px;
+}
+
+.forecast-card {
+    min-height: 180px;
+
+    padding: 20px;
+
+    border-radius: 16px;
+
+    background: #1b1b1f;
+    border: 1px solid #29292f;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+}
+
+
+/* =========================
+   Recent Searches
+========================= */
+
+#recent-searches {
+    padding: 20px;
+
+    border-radius: 16px;
+
+    background: #1b1b1f;
+    border: 1px solid #29292f;
+}
+
+#recent-searches h2 {
+    margin-bottom: 14px;
+    font-size: 18px;
+}
+
+.recent-city {
+    display: inline-block;
+
+    margin: 4px;
+    padding: 8px 14px;
+
+    border-radius: 20px;
+
+    background: #29292f;
+    color: #ddd;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   Loading / Error
+========================= */
+
+#loading,
+#error {
+    max-width: 1200px;
+    margin: 16px auto;
+    padding: 14px 18px;
+
+    border-radius: 10px;
+
+    text-align: center;
+}
+
+#loading {
+    background: #1b1b1f;
+    color: #aaa;
+}
+
+#error {
+    background: #3a1f23;
+    color: #ffb4b4;
+}
+
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 800px) {
+    body {
+        padding: 16px;
+    }
+
+    .header {
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    .logo {
+        width: 100%;
+    }
+
+    #search-form {
+        width: 100%;
+        order: 2;
+    }
+
+    .unit-toggle {
+        order: 3;
+    }
+
+    #forecast {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+@media (max-width: 480px) {
+    .header {
+        margin-bottom: 20px;
+    }
+
+    #search-form {
+        flex-direction: column;
+    }
+
+    #search-form button {
+        width: 100%;
+    }
+
+    #forecast {
+        grid-template-columns: 1fr;
+    }
+
+    #current-weather {
+        min-height: 200px;
+        padding: 20px;
+    }
+}

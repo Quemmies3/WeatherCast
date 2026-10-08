@@ -30,7 +30,11 @@ WeatherCast/
 ├── css/
 │   └── style.css
 ├── js/
-│   └── app.js
+│   ├── api.js
+│   ├── app.js
+│   ├── storage.js
+│   ├── weather.js
+│   └── ui.js
 ├── index.html
 ├── .gitignore
 └── README.md
@@ -72,7 +76,7 @@ We welcome contributions from all team members.
 
 ### Branch Naming
 
-Use:
+Use descriptive feature branches:
 
 ```text
 type/short-description
@@ -92,6 +96,20 @@ Common types:
 - `fix/` — bug fixes
 - `style/` — styling/UI changes
 - `docs/` — documentation
+
+
+## Architecture
+
+The application is divided into separate responsibilities:
+
+- `api.js` handles communication with the weather API.
+- `weather.js` processes and normalizes weather-related data.
+- `ui.js` renders data and controls the visual state of the dashboard.
+- `storage.js` handles localStorage for recent searches and preferences.
+- `app.js` coordinates user interactions and application flow.
+
+API modules should not directly manipulate the DOM, and UI modules should not make API requests directly.
+
 
 ## Repository
 
