@@ -1,4 +1,65 @@
 /* WeatherCast styles */
+
+/* =========================================================
+   MARKUP THE RENDERER (ui.js) SHOULD OUTPUT
+
+   Current weather  -> inside #current-weather (replace the placeholder)
+   <div class="current-header">
+     <span class="current-day">Friday</span>
+     <span class="current-time">11:45 AM</span>
+   </div>
+   <div class="current-body">
+     <div class="current-main">
+       <span class="current-temp">16°</span>
+       <img class="wx-icon wx-icon--lg" src="..." alt="Partly cloudy">
+     </div>
+     <p class="current-condition">Partly cloudy</p>
+     <p class="current-city">Dhaka, Bangladesh</p>
+     <dl class="current-details">
+       <div><dt>Feels like</dt><dd>18°</dd></div>
+       <div><dt>Humidity</dt><dd>51%</dd></div>
+       <div><dt>Wind</dt><dd>7 km/h</dd></div>
+     </dl>
+   </div>
+
+   Forecast card (x5) -> inside #forecast
+   <div class="forecast-card">
+     <span class="forecast-day">Sat</span>
+     <img class="wx-icon" src="..." alt="Light rain">
+     <span class="forecast-temp">10°</span>
+   </div>
+
+   Recent search -> inside #recent-searches (a <button> is best: keyboard accessible)
+   <button class="recent-city" type="button">
+     <span class="recent-name">Lagos</span>
+   </button>
+
+   Weather theme -> document.body.dataset.theme = "clear" | "cloudy" | "rain" | "snow" | "storm"
+========================================================= */
+
+
+/* =========================
+   Tokens
+========================= */
+
+:root {
+    --bg: #0f0f12;
+    --card: rgb(27 27 31 / 0.82);
+    --chip: #26262c;
+    --chip-hover: #32323a;
+    --border: #29292f;
+    --text: #f5f5f5;
+    --muted: #8d8d94;
+
+    --accent: #b8d5ea;
+    --accent-strong: #9fc3de;
+    --ink: #111;
+
+    --radius-lg: 22px;
+    --radius-md: 16px;
+}
+
+
 /* =========================
    Base
 ========================= */
@@ -9,10 +70,17 @@
     padding: 0;
 }
 
+/* Keeps the HTML "hidden" attribute working even if an element gets a display rule */
+[hidden] {
+    display: none !important;
+}
+
 body {
     min-height: 100vh;
-    background: #0f0f12;
-    color: #f5f5f5;
+    background-color: var(--bg);
+    background-image: var(--bg-image, none);
+    background-repeat: no-repeat;
+    color: var(--text);
     font-family: Arial, Helvetica, sans-serif;
     padding: 24px;
 }
@@ -22,6 +90,40 @@ input {
     font: inherit;
 }
 
+button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Visually hidden, still read by screen readers */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.placeholder {
+    margin: auto;
+    color: var(--muted);
+    text-align: center;
+}
+
+
+/* =========================
+   Weather themes
+   (set by JS: document.body.dataset.theme = "rain")
+   Keep backgrounds dark so light text stays readable.
+========================= */
+
+body[data-theme="clear"]  { --bg-image: linear-gradient(160deg, #3b3220 0%, #0f0f12 60%); }
+body[data-theme="cloudy"] { --bg-image: linear-gradient(160deg, #2a2f3a 0%, #0f0f12 60%); }
+body[data-theme="rain"]   { --bg-image: linear-gradient(160deg, #1a2a40 0%, #0f0f12 60%); }
+body[data-theme="snow"]   { --bg-image: linear-gradient(160deg, #2c3d4f 0%, #121418 60%); }
+body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0f12 60%); }
+
 
 /* =========================
    Header
@@ -29,7 +131,7 @@ input {
 
 .header {
     max-width: 1200px;
-    margin: 0 auto 32px;
+    margin: 0 auto 24px;
 
     display: flex;
     align-items: center;
@@ -48,9 +150,31 @@ input {
     gap: 8px;
 }
 
+.search-field {
+    position: relative;
+    flex: 1;
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 18px;
+    height: 18px;
+
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 2;
+    stroke-linecap: round;
+
+    pointer-events: none;
+}
+
 #city-input {
     width: 100%;
-    padding: 12px 16px;
+    padding: 12px 16px 12px 42px;
 
     border: 1px solid #33343a;
     border-radius: 10px;
@@ -61,7 +185,7 @@ input {
 }
 
 #city-input::placeholder {
-    color: #8d8d94;
+    color: var(--muted);
 }
 
 #city-input:focus {
@@ -74,8 +198,8 @@ input {
     border: none;
     border-radius: 10px;
 
-    background: #b8d5ea;
-    color: #111;
+    background: var(--accent);
+    color: var(--ink);
 
     cursor: pointer;
     font-weight: 600;
@@ -117,105 +241,8 @@ input {
 }
 
 .unit-toggle button.active {
-    background: #b8d5ea;
-    color: #111;
-}
-
-
-/* =========================
-   Main
-========================= */
-
-main {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-
-/* =========================
-   Current Weather
-========================= */
-
-#current-weather {
-    min-height: 240px;
-
-    margin-bottom: 28px;
-    padding: 28px;
-
-    border-radius: 18px;
-
-    background: #1b1b1f;
-    border: 1px solid #29292f;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: #888;
-}
-
-
-/* =========================
-   Forecast
-========================= */
-
-#forecast {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 16px;
-
-    margin-bottom: 28px;
-}
-
-.forecast-card {
-    min-height: 180px;
-
-    padding: 20px;
-
-    border-radius: 16px;
-
-    background: #1b1b1f;
-    border: 1px solid #29292f;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    gap: 10px;
-}
-
-
-/* =========================
-   Recent Searches
-========================= */
-
-#recent-searches {
-    padding: 20px;
-
-    border-radius: 16px;
-
-    background: #1b1b1f;
-    border: 1px solid #29292f;
-}
-
-#recent-searches h2 {
-    margin-bottom: 14px;
-    font-size: 18px;
-}
-
-.recent-city {
-    display: inline-block;
-
-    margin: 4px;
-    padding: 8px 14px;
-
-    border-radius: 20px;
-
-    background: #29292f;
-    color: #ddd;
-
-    cursor: pointer;
+    background: var(--accent);
+    color: var(--ink);
 }
 
 
@@ -226,7 +253,7 @@ main {
 #loading,
 #error {
     max-width: 1200px;
-    margin: 16px auto;
+    margin: 0 auto 16px;
     padding: 14px 18px;
 
     border-radius: 10px;
@@ -246,8 +273,244 @@ main {
 
 
 /* =========================
+   Layout
+   main = [ current + forecast ] [ recent searches sidebar ]
+========================= */
+
+.dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 24px;
+}
+
+.weather-main {
+    min-width: 0;
+    min-height: 320px;
+
+    display: grid;
+    grid-template-columns: minmax(190px, 1.5fr) 5fr;
+    gap: 16px;
+}
+
+
+/* =========================
+   Current Weather
+========================= */
+
+#current-weather {
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    border-radius: var(--radius-lg);
+
+    background: var(--accent);
+    color: var(--ink);
+}
+
+#current-weather .placeholder {
+    padding: 24px;
+    color: rgb(17 17 17 / 0.6);
+}
+
+.current-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+
+    padding: 14px 18px;
+
+    background: var(--accent-strong);
+    font-weight: 600;
+}
+
+.current-body {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    padding: 18px;
+}
+
+.current-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.current-temp {
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.current-condition {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.current-city {
+    font-size: 14px;
+    opacity: 0.75;
+}
+
+.current-details {
+    margin-top: auto;
+    padding-top: 12px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+}
+
+.current-details div {
+    display: flex;
+    flex-direction: column;
+}
+
+.current-details dt {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.current-details dd {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+/* =========================
+   Forecast
+========================= */
+
+#forecast {
+    min-width: 0;
+
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.forecast-card {
+    padding: 18px 10px 22px;
+
+    border-radius: 32px;
+
+    background: var(--card);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(6px);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.forecast-day {
+    width: 100%;
+    padding-bottom: 12px;
+
+    border-bottom: 1px solid #34343b;
+
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.forecast-temp {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+
+/* =========================
+   Icons
+========================= */
+
+.wx-icon {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+}
+
+.wx-icon--lg {
+    width: 88px;
+    height: 88px;
+}
+
+
+/* =========================
+   Recent Searches
+========================= */
+
+#recent-searches {
+    align-self: start;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    padding: 20px;
+
+    border-radius: var(--radius-lg);
+
+    background: var(--card);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(6px);
+}
+
+#recent-searches h2 {
+    margin-bottom: 4px;
+    font-size: 18px;
+}
+
+.recent-city {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    width: 100%;
+    padding: 14px 16px;
+
+    border: none;
+    border-radius: var(--radius-md);
+
+    background: var(--chip);
+    color: #ddd;
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.recent-city:hover {
+    background: var(--chip-hover);
+}
+
+.recent-city .wx-icon {
+    width: 36px;
+    height: 36px;
+}
+
+
+/* =========================
    Responsive
 ========================= */
+
+/* Sidebar drops below the weather */
+@media (max-width: 1000px) {
+    .dashboard {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
 
 @media (max-width: 800px) {
     body {
@@ -272,11 +535,31 @@ main {
         order: 3;
     }
 
-    #forecast {
-        grid-template-columns: repeat(2, 1fr);
+    .weather-main {
+        grid-template-columns: minmax(0, 1fr);
+        min-height: 0;
+    }
+
+    .forecast-card {
+        min-height: 200px;
     }
 }
 
+/* Forecast becomes a swipeable strip inside its own container,
+   so the page itself never scrolls sideways. */
+@media (max-width: 600px) {
+    #forecast {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+        padding-bottom: 6px;
+    }
+
+    .forecast-card {
+        flex: 0 0 104px;
+        scroll-snap-align: start;
+    }
+}
 
 @media (max-width: 480px) {
     .header {
@@ -291,12 +574,13 @@ main {
         width: 100%;
     }
 
-    #forecast {
-        grid-template-columns: 1fr;
-    }
-
-    #current-weather {
-        min-height: 200px;
-        padding: 20px;
+    .current-temp {
+        font-size: 48px;
     }
 }
+
+.forecast-range { font-size: 13px; color: var(--muted); }
+.recent-meta { font-size: 13px; color: var(--muted); }
+.recent-empty { font-size: 14px; color: var(--muted); }
+.attribution { max-width: 1200px; margin: 32px auto 0; font-size: 13px; color: var(--muted); }
+.attribution a { color: var(--accent); }

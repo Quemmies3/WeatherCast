@@ -17,11 +17,19 @@
         </div>
 
         <form id="search-form">
-            <input
-                id="city-input"
-                type="search"
-                placeholder="Search city..."
-            />
+            <div class="search-field">
+                <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+
+                <label class="sr-only" for="city-input">City name</label>
+                <input
+                    id="city-input"
+                    type="search"
+                    placeholder="Search city..."
+                />
+            </div>
 
             <button type="submit">
                 Search
@@ -29,49 +37,56 @@
         </form>
 
         <div class="unit-toggle">
-            <button id="celsius-btn">°C</button>
+            <!-- "active" is set here so the page matches currentUnit = "celsius" on load -->
+            <button id="celsius-btn" class="active">°C</button>
             <button id="fahrenheit-btn">°F</button>
         </div>
     </header>
 
 
+    <!-- Moved above <main> so they don't become grid items. IDs unchanged. -->
+    <div id="loading" role="status" hidden>
+        Loading...
+    </div>
 
-    <main>
+    <div id="error" role="alert" hidden>
+        <!-- Error message -->
+    </div>
 
-        <section id="current-weather">
-            <!-- Current weather -->
-              Search for a city to see the weather.
-        </section>
 
-        <section id="forecast">
-            <!-- 5-day forecast -->
-            <div class="forecast-card">--</div>
-            <div class="forecast-card">--</div>
-            <div class="forecast-card">--</div>
-            <div class="forecast-card">--</div>
-            <div class="forecast-card">--</div>
-        </section>
+    <main class="dashboard">
 
-        <section id="recent-searches">
+        <div class="weather-main">
+
+            <section id="current-weather" aria-label="Current weather">
+                <!-- Current weather -->
+                <p class="placeholder">Search for a city to see the weather.</p>
+            </section>
+
+            <section id="forecast" aria-label="5-day forecast">
+                <!-- 5-day forecast -->
+                <div class="forecast-card"><span class="placeholder">--</span></div>
+                <div class="forecast-card"><span class="placeholder">--</span></div>
+                <div class="forecast-card"><span class="placeholder">--</span></div>
+                <div class="forecast-card"><span class="placeholder">--</span></div>
+                <div class="forecast-card"><span class="placeholder">--</span></div>
+            </section>
+
+        </div>
+
+        <section id="recent-searches" aria-label="Recent searches">
             <!-- Recent searches -->
-             <h2>Recent Searches</h2>
+            <h2>Recent Searches</h2>
         </section>
-
-    
-
-        <div id="loading" hidden>
-            Loading...
-        </div>
-
-        <div id="error" hidden>
-            <!-- Error message -->
-        </div>
 
     </main>
 
 
+    <footer class="attribution">
+        Weather data by <a href="https://open-meteo.com/">Open-Meteo.com</a>.
+        Icons by <a href="https://meteocons.com/">Meteocons</a>.
+    </footer>
 
-
-      <script type="module"  src="js/app.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
 </html>
