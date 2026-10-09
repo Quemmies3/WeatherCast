@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WeatherCast</title>
 
+  <!-- Applies the saved light/dark mode before the page paints, so there is no flash. -->
+  <script>
+    try {
+      if (localStorage.getItem("weathercast:mode") === "light") {
+        document.documentElement.dataset.mode = "light";
+      }
+    } catch (error) { /* storage unavailable: stay in dark mode */ }
+  </script>
+
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -13,7 +22,16 @@
     <header class="header">
 
         <div class="logo">
-            WeatherCast
+            <img class="brand-icon" src="assets/icons/partly-cloudy-day.svg" alt="" width="44" height="44">
+            <span>WeatherCast</span>
+        </div>
+
+        <div class="nav-location" id="location-label" aria-live="polite">
+            <svg class="pin" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span class="nav-location-text" id="location-text">Search a city</span>
         </div>
 
         <form id="search-form">
@@ -36,15 +54,28 @@
             </button>
         </form>
 
-        <div class="unit-toggle">
-            <!-- "active" is set here so the page matches currentUnit = "celsius" on load -->
-            <button id="celsius-btn" class="active">°C</button>
-            <button id="fahrenheit-btn">°F</button>
+        <div class="nav-actions">
+            <div class="unit-toggle">
+                <button id="celsius-btn" class="active">°C</button>
+                <button id="fahrenheit-btn">°F</button>
+            </div>
+
+            <!-- aria-checked="true" means dark mode is on -->
+            <button id="theme-toggle" class="theme-toggle" type="button" role="switch" aria-checked="true" aria-label="Dark mode">
+                <span class="theme-knob">
+                    <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+                    </svg>
+                </span>
+            </button>
         </div>
     </header>
 
 
-    <!-- Moved above <main> so they don't become grid items. IDs unchanged. -->
     <div id="loading" role="status" hidden>
         Loading...
     </div>
@@ -80,7 +111,6 @@
         </section>
 
     </main>
-
 
     <footer class="attribution">
         Weather data by <a href="https://open-meteo.com/">Open-Meteo.com</a>.

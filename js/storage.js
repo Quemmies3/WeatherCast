@@ -3,6 +3,7 @@
 
 const RECENT_KEY = "weathercast:recent";
 const UNIT_KEY = "weathercast:unit";
+const MODE_KEY = "weathercast:mode"; // plain text ("light"/"dark"); index.html reads this key before the page paints
 const MAX_RECENT = 5;
 
 // Storage can fail (private mode, blocked cookies, corrupted data),
@@ -80,4 +81,26 @@ export function getUnit() {
 
 export function saveUnit(unit) {
     writeJson(UNIT_KEY, unit);
+}
+
+
+// =========================
+// Light / dark mode
+// =========================
+
+/** Returns "dark" (default) or "light". */
+export function getMode() {
+    try {
+        return localStorage.getItem(MODE_KEY) === "light" ? "light" : "dark";
+    } catch {
+        return "dark";
+    }
+}
+
+export function saveMode(mode) {
+    try {
+        localStorage.setItem(MODE_KEY, mode);
+    } catch {
+        // Ignore: the app still works, it just won't remember.
+    }
 }

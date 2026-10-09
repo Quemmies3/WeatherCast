@@ -10,8 +10,10 @@ const searchForm = document.getElementById("search-form");
 const cityInput = document.getElementById("city-input");
 const celsiusBtn = document.getElementById("celsius-btn");
 const fahrenheitBtn = document.getElementById("fahrenheit-btn");
+const themeToggle = document.getElementById("theme-toggle");
 
 let currentUnit = storage.getUnit();
+let currentMode = storage.getMode();
 let lastWeather = null;   // most recent clean weather data, used to redraw when the unit changes
 let latestRequest = 0;    // lets us ignore slow responses from older searches
 
@@ -98,8 +100,28 @@ fahrenheitBtn.addEventListener("click", () => setUnit("fahrenheit"));
 
 
 // =========================
+// Light / Dark Mode Switch
+// =========================
+
+themeToggle.addEventListener("click", () => {
+    currentMode = currentMode === "dark" ? "light" : "dark";
+    storage.saveMode(currentMode);
+    ui.setMode(currentMode);
+});
+
+
+// =========================
 // Start-up
 // =========================
 
+ui.setMode(currentMode);
 ui.setActiveUnit(currentUnit);
-ui.renderRecent(storage.getRecentSearches(), handleRecentSelect);
+
+const recentSearches = storage.getRecentSearches();
+ui.renderRecent(recentSearches, handleRecentSelect);
+
+// Reopen on the last city searched, so a refresh doesn't empty the dashboard.
+// (Delete these 3 lines if you'd rather start on the empty "Search for a city" screen.)
+if (recentSearches.length > 0) {
+    handleRecentSelect(recentSearches[0]);
+}

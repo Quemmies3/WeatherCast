@@ -23,6 +23,8 @@ const errorEl = document.getElementById("error");
 const searchButton = document.querySelector("#search-form button");
 const celsiusBtn = document.getElementById("celsius-btn");
 const fahrenheitBtn = document.getElementById("fahrenheit-btn");
+const themeToggle = document.getElementById("theme-toggle");
+const locationText = document.getElementById("location-text");
 
 
 // =========================
@@ -43,8 +45,8 @@ function makeIcon(code, isDay, className) {
     const img = el("img", className);
     img.src = `${ICON_FOLDER}/${icon}.svg`;
     img.alt = label;
-    img.width = 56;
-    img.height = 56;
+    img.width = 64;
+    img.height = 64;
 
     // If an icon file is missing, show a generic one instead of a broken image.
     img.onerror = () => {
@@ -53,6 +55,12 @@ function makeIcon(code, isDay, className) {
     };
 
     return img;
+}
+
+/** "Berlin, Germany" - but just "Poland" when the name and country are the same. */
+function formatPlace(location) {
+    const sameAsCountry = (location.country ?? "").toLowerCase() === location.name.toLowerCase();
+    return location.country && !sameAsCountry ? `${location.name}, ${location.country}` : location.name;
 }
 
 function detailRow(label, value) {
@@ -110,13 +118,11 @@ export function renderCurrent(data, unit) {
         detailRow("Wind", formatWind(current.windSpeed))
     );
 
-    const place = location.country ? `${location.name}, ${location.country}` : location.name;
-
     const body = el("div", "current-body");
     body.append(
         main,
         el("p", "current-condition", getWeatherLabel(current.weatherCode)),
-        el("p", "current-city", place),
+        el("p", "current-city", formatPlace(location)),
         details
     );
 
@@ -140,9 +146,25 @@ export function renderForecast(daily, unit) {
 
 /** Draws everything for one search result and applies the weather theme. */
 export function renderWeather(data, unit) {
+    setLocationLabel(formatPlace(data.location));
     renderCurrent(data, unit);
     renderForecast(data.daily, unit);
     setTheme(getWeatherVisual(data.current.weatherCode, data.current.isDay).theme);
+}
+
+
+// =========================
+// Navbar: location label and light/dark switch
+// =========================
+
+export function setLocationLabel(text) {
+    locationText.textContent = text;
+}
+
+/** mode is "dark" or "light". The look itself comes from CSS (:root[data-mode]). */
+export function setMode(mode) {
+    document.documentElement.dataset.mode = mode;
+    themeToggle.setAttribute("aria-checked", String(mode === "dark"));
 }
 
 
@@ -178,7 +200,7 @@ export function renderRecent(list, onSelect) {
         button.type = "button";
         button.append(el("span", "recent-name", location.name));
 
-        if (location.country) {
+        if (location.country && location.country.toLowerCase() !== location.name.toLowerCase()) {
             button.append(el("span", "recent-meta", location.country));
         }
 
