@@ -44,19 +44,19 @@
     </header>
 
 
-    <!-- Moved above <main> so they don't become grid items. IDs unchanged. -->
-    <div id="loading" role="status" hidden>
-        Loading...
-    </div>
-
-    <div id="error" role="alert" hidden>
-        <!-- Error message -->
-    </div>
-
-
     <main class="dashboard">
 
         <div class="weather-main">
+
+
+      <div id="loading" role="status" hidden>
+        <span class="spinner" aria-hidden="true"></span>
+        <span>Loading weather…</span>
+      </div>
+
+      <div id="error" role="alert" hidden></div>
+
+  
 
             <section id="current-weather" aria-label="Current weather">
                 <!-- Current weather -->
