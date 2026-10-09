@@ -21,6 +21,8 @@ const recentEl = document.getElementById("recent-searches");
 const loadingEl = document.getElementById("loading");
 const errorEl = document.getElementById("error");
 const searchButton = document.querySelector("#search-form button");
+const weatherMainEl = document.querySelector(".weather-main");
+const searchInput = document.getElementById("city-input");
 const celsiusBtn = document.getElementById("celsius-btn");
 const fahrenheitBtn = document.getElementById("fahrenheit-btn");
 
@@ -60,6 +62,24 @@ function detailRow(label, value) {
     row.append(el("dt", "", label), el("dd", "", value));
     return row;
 }
+function makeClockIcon() {
+    const NS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("class", "empty-icon");
+    svg.setAttribute("aria-hidden", "true");
+
+    const circle = document.createElementNS(NS, "circle");
+    circle.setAttribute("cx", "12");
+    circle.setAttribute("cy", "12");
+    circle.setAttribute("r", "9");
+
+    const hands = document.createElementNS(NS, "polyline");
+    hands.setAttribute("points", "12 7 12 12 15.5 14");
+
+    svg.append(circle, hands);
+    return svg;
+}
 
 
 // =========================
@@ -68,19 +88,50 @@ function detailRow(label, value) {
 
 export function showLoading(isLoading) {
     loadingEl.hidden = !isLoading;
+    weatherMainEl.classList.toggle("is-loading", isLoading);
+    weatherMainEl.setAttribute("aria-busy", String(isLoading));
+
+    searchInput.disabled = isLoading;
     searchButton.disabled = isLoading;
+    searchButton.textContent = isLoading ? "Searching…" : "Search";
 }
 
-export function showError(message) {
-    errorEl.textContent = message;
+/**
+ * options: { kind, title, message, actionLabel, onAction }
+ *   kind         "not-found" | "network" | "error" (picks the icon)
+ *   actionLabel  optional button text, e.g. "Try again"
+ *   onAction     called when that button is clicked
+ */
+export function showError(options) {
+    // app.js still passes a plain string until Step 6, so accept that too.
+    if (typeof options === "string") {
+        options = { title: "Something went wrong", message: options };
+    }
+
+    const { kind = "error", title, message, actionLabel, onAction } = options;
+
+    const icon = el("div", "error-icon", kind === "not-found" ? "?" : "!");
+    icon.setAttribute("aria-hidden", "true");
+
+    const nodes = [icon, el("h2", "error-title", title), el("p", "error-message", message)];
+
+    if (actionLabel && onAction) {
+        const button = el("button", "error-action", actionLabel);
+        button.type = "button";
+        button.addEventListener("click", onAction);
+        nodes.push(button);
+    }
+
+    errorEl.replaceChildren(...nodes);
     errorEl.hidden = false;
+    weatherMainEl.classList.add("has-error");
 }
 
 export function hideError() {
-    errorEl.textContent = "";
+    errorEl.replaceChildren();
     errorEl.hidden = true;
+    weatherMainEl.classList.remove("has-error");
 }
-
 
 // =========================
 // Weather
@@ -168,10 +219,16 @@ export function renderRecent(list, onSelect) {
     // Keep the <h2>; remove only what we added before.
     recentEl.querySelectorAll(".recent-city, .recent-empty").forEach((node) => node.remove());
 
-    if (list.length === 0) {
-        recentEl.append(el("p", "recent-empty", "No searches yet."));
-        return;
-    }
+   if (list.length === 0) {
+    const empty = el("div", "recent-empty");
+    empty.append(
+        makeClockIcon(),
+        el("p", "recent-empty-title", "No recent searches"),
+        el("p", "recent-empty-hint", "Cities you search for will show up here.")
+    );
+    recentEl.append(empty);
+    return;
+}
 
     list.forEach((location) => {
         const button = el("button", "recent-city");

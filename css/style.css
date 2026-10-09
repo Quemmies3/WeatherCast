@@ -246,30 +246,6 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
 }
 
 
-/* =========================
-   Loading / Error
-========================= */
-
-#loading,
-#error {
-    max-width: 1200px;
-    margin: 0 auto 16px;
-    padding: 14px 18px;
-
-    border-radius: 10px;
-
-    text-align: center;
-}
-
-#loading {
-    background: #1b1b1f;
-    color: #aaa;
-}
-
-#error {
-    background: #3a1f23;
-    color: #ffb4b4;
-}
 
 
 /* =========================
@@ -287,6 +263,7 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
 }
 
 .weather-main {
+    position: relative;
     min-width: 0;
     min-height: 320px;
 
@@ -581,6 +558,111 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
 
 .forecast-range { font-size: 13px; color: var(--muted); }
 .recent-meta { font-size: 13px; color: var(--muted); }
-.recent-empty { font-size: 14px; color: var(--muted); }
 .attribution { max-width: 1200px; margin: 32px auto 0; font-size: 13px; color: var(--muted); }
 .attribution a { color: var(--accent); }
+
+/* Disabled search control */
+#search-form button { min-width: 110px; } /* stops the width changing when text becomes "Searching…" */
+
+#search-form button:disabled,
+#search-form button:disabled:hover {
+    background: var(--accent);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#city-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =========================
+   Error state
+========================= */
+
+/* On error, the error card takes the weather area */
+.weather-main.has-error #current-weather,
+.weather-main.has-error #forecast {
+    display: none;
+}
+
+#error {
+    grid-column: 1 / -1;
+    min-height: 280px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 32px 24px;
+
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    border: 1px solid #4a2a2f;
+    text-align: center;
+}
+
+.error-icon {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #3a1f23;
+    color: #ffb4b4;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.error-title { font-size: 20px; }
+
+.error-message {
+    max-width: 420px;
+    color: #b5b5bc;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.error-action {
+    margin-top: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: var(--ink);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.error-action:hover { background: #c9e1f2; }
+
+/* =========================
+   Empty recent searches
+========================= */
+
+.recent-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 24px 12px;
+
+    border: 1px dashed #3a3a42;
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.empty-icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 4px;
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.recent-empty-title { font-size: 15px; font-weight: 600; color: #ddd; }
+.recent-empty-hint { font-size: 13px; color: var(--muted); line-height: 1.4; }
