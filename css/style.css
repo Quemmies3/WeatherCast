@@ -1,62 +1,118 @@
 /* WeatherCast styles */
 
 /* =========================================================
-   MARKUP THE RENDERER (ui.js) SHOULD OUTPUT
+   MARKUP THE RENDERER (ui.js) OUTPUTS
 
-   Current weather  -> inside #current-weather (replace the placeholder)
-   <div class="current-header">
-     <span class="current-day">Friday</span>
-     <span class="current-time">11:45 AM</span>
-   </div>
+   Current weather -> inside #current-weather
+   <div class="current-header"><span class="current-day"/><span class="current-time"/></div>
    <div class="current-body">
-     <div class="current-main">
-       <span class="current-temp">16°</span>
-       <img class="wx-icon wx-icon--lg" src="..." alt="Partly cloudy">
-     </div>
-     <p class="current-condition">Partly cloudy</p>
-     <p class="current-city">Dhaka, Bangladesh</p>
-     <dl class="current-details">
-       <div><dt>Feels like</dt><dd>18°</dd></div>
-       <div><dt>Humidity</dt><dd>51%</dd></div>
-       <div><dt>Wind</dt><dd>7 km/h</dd></div>
-     </dl>
+     <div class="current-main"><span class="current-temp"/><img class="wx-icon wx-icon--lg"/></div>
+     <p class="current-condition"/> <p class="current-city"/>
+     <dl class="current-details"><div><dt/><dd/></div> ...</dl>
    </div>
 
    Forecast card (x5) -> inside #forecast
    <div class="forecast-card">
-     <span class="forecast-day">Sat</span>
-     <img class="wx-icon" src="..." alt="Light rain">
-     <span class="forecast-temp">10°</span>
+     <span class="forecast-day"/> <img class="wx-icon"/>
+     <span class="forecast-temp"/> <span class="forecast-range"/>
    </div>
 
-   Recent search -> inside #recent-searches (a <button> is best: keyboard accessible)
-   <button class="recent-city" type="button">
-     <span class="recent-name">Lagos</span>
-   </button>
+   Recent search -> inside #recent-searches
+   <button class="recent-city"><span class="recent-name"/><span class="recent-meta"/></button>
 
    Weather theme -> document.body.dataset.theme = "clear" | "cloudy" | "rain" | "snow" | "storm"
+   Light/dark    -> document.documentElement.dataset.mode = "dark" | "light"
 ========================================================= */
 
 
 /* =========================
    Tokens
+   Dark is the default. Light mode overrides below.
 ========================= */
 
 :root {
+    color-scheme: dark;
+
     --bg: #0f0f12;
     --card: rgb(27 27 31 / 0.82);
+    --field-bg: #1b1b1f;
+    --field-border: #33343a;
     --chip: #26262c;
     --chip-hover: #32323a;
+    --chip-text: #ddd;
     --border: #29292f;
+    --divider: #34343b;
+
     --text: #f5f5f5;
     --muted: #8d8d94;
+    --link: #b8d5ea;
+
+    --toggle-text: #aaa;
 
     --accent: #b8d5ea;
     --accent-strong: #9fc3de;
+    --accent-hover: #c9e1f2;
+    --focus: #6fa8dc;
     --ink: #111;
+
+    --shadow: none;
+
+    --text-soft: #b5b5bc;
+    --dashed: #3a3a42;
+
+    --loading-veil: rgb(15 15 18 / 0.6);
+    --error-bg: #3a1f23;
+    --error-text: #ffb4b4;
+    --error-border: #4a2a2f;
+
+    /* Page backgrounds for each weather theme */
+    --grad-clear:  linear-gradient(160deg, #3b3220 0%, #0f0f12 60%);
+    --grad-cloudy: linear-gradient(160deg, #2a2f3a 0%, #0f0f12 60%);
+    --grad-rain:   linear-gradient(160deg, #1a2a40 0%, #0f0f12 60%);
+    --grad-snow:   linear-gradient(160deg, #2c3d4f 0%, #121418 60%);
+    --grad-storm:  linear-gradient(160deg, #2b2142 0%, #0f0f12 60%);
 
     --radius-lg: 22px;
     --radius-md: 16px;
+}
+
+:root[data-mode="light"] {
+    color-scheme: light;
+
+    --bg: #f3f5f8;
+    --card: rgb(255 255 255 / 0.85);
+    --field-bg: #ffffff;
+    --field-border: #cfd5df;
+    --chip: #eef1f6;
+    --chip-hover: #e2e8f0;
+    --chip-text: #2a2f38;
+    --border: #dde2ea;
+    --divider: #dde2ea;
+
+    --text: #14161a;
+    --muted: #4d5461;
+    --link: #1d5f9e;
+
+    --toggle-text: #5a6270;
+
+    --accent-hover: #a9cbe3;
+    --focus: #2b78c2;
+
+    --shadow: 0 6px 20px rgb(30 50 80 / 0.12);
+
+    --text-soft: #3a414d;
+    --dashed: #c3cad6;
+
+    --loading-veil: rgb(243 245 248 / 0.7);
+    --error-bg: #fde8ea;
+    --error-text: #8a1c2b;
+    --error-border: #f0b4bb;
+
+    --grad-clear:  linear-gradient(160deg, #ffe9b8 0%, #f3f5f8 60%);
+    --grad-cloudy: linear-gradient(160deg, #d9dfe8 0%, #f3f5f8 60%);
+    --grad-rain:   linear-gradient(160deg, #c5d6ea 0%, #f3f5f8 60%);
+    --grad-snow:   linear-gradient(160deg, #dbe9f5 0%, #f6f8fb 60%);
+    --grad-storm:  linear-gradient(160deg, #d3c9e8 0%, #f3f5f8 60%);
 }
 
 
@@ -91,7 +147,7 @@ input {
 }
 
 button:focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
 }
 
@@ -115,18 +171,18 @@ button:focus-visible {
 /* =========================
    Weather themes
    (set by JS: document.body.dataset.theme = "rain")
-   Keep backgrounds dark so light text stays readable.
 ========================= */
 
-body[data-theme="clear"]  { --bg-image: linear-gradient(160deg, #3b3220 0%, #0f0f12 60%); }
-body[data-theme="cloudy"] { --bg-image: linear-gradient(160deg, #2a2f3a 0%, #0f0f12 60%); }
-body[data-theme="rain"]   { --bg-image: linear-gradient(160deg, #1a2a40 0%, #0f0f12 60%); }
-body[data-theme="snow"]   { --bg-image: linear-gradient(160deg, #2c3d4f 0%, #121418 60%); }
-body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0f12 60%); }
+body[data-theme="clear"]  { --bg-image: var(--grad-clear); }
+body[data-theme="cloudy"] { --bg-image: var(--grad-cloudy); }
+body[data-theme="rain"]   { --bg-image: var(--grad-rain); }
+body[data-theme="snow"]   { --bg-image: var(--grad-snow); }
+body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 
 
 /* =========================
-   Header
+   Navbar
+   [logo] [location] [search ............] [units] [theme]
 ========================= */
 
 .header {
@@ -135,12 +191,57 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
 
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 16px;
 }
 
 .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
     font-size: 24px;
     font-weight: 700;
+    white-space: nowrap;
+}
+
+.brand-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+}
+
+.nav-location {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    min-width: 0;
+    max-width: 230px;
+    padding: 9px 14px;
+
+    border-radius: 999px;
+    border: 1px solid var(--border);
+
+    background: var(--field-bg);
+    color: var(--text);
+    font-size: 14px;
+}
+
+.nav-location .pin {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+
+    fill: none;
+    stroke: var(--link);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.nav-location-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
@@ -176,11 +277,11 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
     width: 100%;
     padding: 12px 16px 12px 42px;
 
-    border: 1px solid #33343a;
+    border: 1px solid var(--field-border);
     border-radius: 10px;
 
-    background: #1b1b1f;
-    color: #fff;
+    background: var(--field-bg);
+    color: var(--text);
     outline: none;
 }
 
@@ -189,7 +290,7 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
 }
 
 #city-input:focus {
-    border-color: #6fa8dc;
+    border-color: var(--focus);
 }
 
 #search-form button {
@@ -206,7 +307,30 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
 }
 
 #search-form button:hover {
-    background: #c9e1f2;
+    background: var(--accent-hover);
+}
+
+/* Keeps the width steady when the text changes to "Searching…" */
+#search-form button {
+    min-width: 110px;
+}
+
+#search-form button:disabled,
+#search-form button:disabled:hover {
+    background: var(--accent);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#city-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 
@@ -221,7 +345,8 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
     padding: 4px;
     border-radius: 10px;
 
-    background: #1b1b1f;
+    background: var(--field-bg);
+    border: 1px solid var(--border);
 }
 
 .unit-toggle button {
@@ -231,13 +356,13 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
     border-radius: 7px;
 
     background: transparent;
-    color: #aaa;
+    color: var(--toggle-text);
 
     cursor: pointer;
 }
 
 .unit-toggle button:hover {
-    color: #fff;
+    color: var(--text);
 }
 
 .unit-toggle button.active {
@@ -246,6 +371,191 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
 }
 
 
+/* =========================
+   Light / Dark switch
+   Looks are driven by :root[data-mode], so the saved mode
+   shows correctly even before JavaScript runs.
+========================= */
+
+.theme-toggle {
+    position: relative;
+
+    width: 64px;
+    height: 34px;
+    padding: 3px;
+
+    border: 1px solid var(--border);
+    border-radius: 999px;
+
+    background: var(--field-bg);
+    cursor: pointer;
+}
+
+.theme-knob {
+    display: grid;
+    place-items: center;
+
+    width: 26px;
+    height: 26px;
+
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--ink);
+
+    transform: translateX(30px); /* dark = knob on the right */
+    transition: transform 0.2s ease;
+}
+
+:root[data-mode="light"] .theme-knob {
+    transform: translateX(0);
+}
+
+.theme-knob svg {
+    width: 15px;
+    height: 15px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.icon-sun {
+    display: none;
+}
+
+:root[data-mode="light"] .icon-sun {
+    display: block;
+}
+
+:root[data-mode="light"] .icon-moon {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-knob {
+        transition: none;
+    }
+}
+
+
+/* =========================
+   Loading
+   #loading sits inside .weather-main (position: relative) and veils the weather area.
+========================= */
+
+#loading {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    border-radius: var(--radius-lg);
+
+    background: var(--loading-veil);
+    backdrop-filter: blur(2px);
+    color: var(--text);
+    font-weight: 600;
+}
+
+.spinner {
+    width: 22px;
+    height: 22px;
+
+    border: 3px solid rgb(128 128 140 / 0.35);
+    border-top-color: var(--link);
+    border-radius: 50%;
+
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner {
+        animation-duration: 1.8s;
+    }
+}
+
+
+/* =========================
+   Error state
+   On error, the error card takes the weather area.
+========================= */
+
+.weather-main.has-error #current-weather,
+.weather-main.has-error #forecast {
+    display: none;
+}
+
+#error {
+    grid-column: 1 / -1;
+    min-height: 280px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    padding: 32px 24px;
+
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    border: 1px solid var(--error-border);
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.error-icon {
+    width: 44px;
+    height: 44px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+    background: var(--error-bg);
+    color: var(--error-text);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.error-title {
+    font-size: 20px;
+}
+
+.error-message {
+    max-width: 420px;
+
+    color: var(--text-soft);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.error-action {
+    margin-top: 8px;
+    padding: 10px 20px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: var(--accent);
+    color: var(--ink);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.error-action:hover {
+    background: var(--accent-hover);
+}
 
 
 /* =========================
@@ -268,7 +578,7 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
     min-height: 320px;
 
     display: grid;
-    grid-template-columns: minmax(190px, 1.5fr) 5fr;
+    grid-template-columns: minmax(210px, 1.7fr) 5fr;
     gap: 16px;
 }
 
@@ -284,6 +594,7 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
     overflow: hidden;
 
     border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
 
     background: var(--accent);
     color: var(--ink);
@@ -317,13 +628,14 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
 
 .current-main {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 4px 8px;
 }
 
 .current-temp {
-    font-size: 56px;
+    font-size: 52px;
     font-weight: 700;
     line-height: 1;
 }
@@ -382,6 +694,7 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
 
     background: var(--card);
     border: 1px solid var(--border);
+    box-shadow: var(--shadow);
     backdrop-filter: blur(6px);
 
     display: flex;
@@ -395,7 +708,7 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
     width: 100%;
     padding-bottom: 12px;
 
-    border-bottom: 1px solid #34343b;
+    border-bottom: 1px solid var(--divider);
 
     text-align: center;
     font-size: 14px;
@@ -407,20 +720,25 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
     font-weight: 700;
 }
 
+.forecast-range {
+    font-size: 13px;
+    color: var(--muted);
+}
+
 
 /* =========================
    Icons
 ========================= */
 
 .wx-icon {
-    width: 56px;
-    height: 56px;
+    width: 64px;
+    height: 64px;
     object-fit: contain;
 }
 
 .wx-icon--lg {
-    width: 88px;
-    height: 88px;
+    width: 80px;
+    height: 80px;
 }
 
 
@@ -441,6 +759,7 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
 
     background: var(--card);
     border: 1px solid var(--border);
+    box-shadow: var(--shadow);
     backdrop-filter: blur(6px);
 }
 
@@ -462,7 +781,7 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
     border-radius: var(--radius-md);
 
     background: var(--chip);
-    color: #ddd;
+    color: var(--chip-text);
     text-align: left;
 
     cursor: pointer;
@@ -477,10 +796,109 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
     height: 36px;
 }
 
+.recent-meta {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* Empty state (no searches yet) */
+.recent-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+
+    padding: 24px 12px;
+
+    border: 1px dashed var(--dashed);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.empty-icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 4px;
+
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.recent-empty-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--chip-text);
+}
+
+.recent-empty-hint {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+}
+
+
+/* =========================
+   Footer
+========================= */
+
+.attribution {
+    max-width: 1200px;
+    margin: 32px auto 0;
+
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.attribution a {
+    color: var(--link);
+}
+
 
 /* =========================
    Responsive
 ========================= */
+
+/* Navbar wraps into three rows:
+   [logo ............ theme]
+   [search .................]
+   [location ......... units]  */
+@media (max-width: 960px) {
+    .header {
+        flex-wrap: wrap;
+    }
+
+    /* Lets the unit toggle and theme switch be positioned individually */
+    .nav-actions {
+        display: contents;
+    }
+
+    .logo {
+        order: 1;
+        margin-right: auto;
+    }
+
+    .theme-toggle {
+        order: 2;
+    }
+
+    #search-form {
+        order: 3;
+        flex: 1 1 100%;
+    }
+
+    .nav-location {
+        order: 4;
+        max-width: calc(100% - 140px);
+    }
+
+    .unit-toggle {
+        order: 5;
+        margin-left: auto;
+    }
+}
 
 /* Sidebar drops below the weather */
 @media (max-width: 1000px) {
@@ -492,24 +910,6 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
 @media (max-width: 800px) {
     body {
         padding: 16px;
-    }
-
-    .header {
-        flex-wrap: wrap;
-        gap: 14px;
-    }
-
-    .logo {
-        width: 100%;
-    }
-
-    #search-form {
-        width: 100%;
-        order: 2;
-    }
-
-    .unit-toggle {
-        order: 3;
     }
 
     .weather-main {
@@ -535,12 +935,18 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
     .forecast-card {
         flex: 0 0 104px;
         scroll-snap-align: start;
+        box-shadow: none; /* the scroll container would clip it */
     }
 }
 
 @media (max-width: 480px) {
-    .header {
-        margin-bottom: 20px;
+    .logo {
+        font-size: 21px;
+    }
+
+    .brand-icon {
+        width: 38px;
+        height: 38px;
     }
 
     #search-form {
@@ -555,114 +961,3 @@ body[data-theme="storm"]  { --bg-image: linear-gradient(160deg, #2b2142 0%, #0f0
         font-size: 48px;
     }
 }
-
-.forecast-range { font-size: 13px; color: var(--muted); }
-.recent-meta { font-size: 13px; color: var(--muted); }
-.attribution { max-width: 1200px; margin: 32px auto 0; font-size: 13px; color: var(--muted); }
-.attribution a { color: var(--accent); }
-
-/* Disabled search control */
-#search-form button { min-width: 110px; } /* stops the width changing when text becomes "Searching…" */
-
-#search-form button:disabled,
-#search-form button:disabled:hover {
-    background: var(--accent);
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-#city-input:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* =========================
-   Error state
-========================= */
-
-/* On error, the error card takes the weather area */
-.weather-main.has-error #current-weather,
-.weather-main.has-error #forecast {
-    display: none;
-}
-
-#error {
-    grid-column: 1 / -1;
-    min-height: 280px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 32px 24px;
-
-    border-radius: var(--radius-lg);
-    background: var(--card);
-    border: 1px solid #4a2a2f;
-    text-align: center;
-}
-
-.error-icon {
-    width: 44px;
-    height: 44px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    background: #3a1f23;
-    color: #ffb4b4;
-    font-size: 22px;
-    font-weight: 700;
-}
-
-.error-title { font-size: 20px; }
-
-.error-message {
-    max-width: 420px;
-    color: #b5b5bc;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
-}
-
-.error-action {
-    margin-top: 8px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
-    background: var(--accent);
-    color: var(--ink);
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.error-action:hover { background: #c9e1f2; }
-
-/* =========================
-   Empty recent searches
-========================= */
-
-.recent-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 24px 12px;
-
-    border: 1px dashed #3a3a42;
-    border-radius: var(--radius-md);
-    text-align: center;
-}
-
-.empty-icon {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 4px;
-    fill: none;
-    stroke: var(--muted);
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-.recent-empty-title { font-size: 15px; font-weight: 600; color: #ddd; }
-.recent-empty-hint { font-size: 13px; color: var(--muted); line-height: 1.4; }
