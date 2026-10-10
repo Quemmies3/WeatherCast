@@ -1,0 +1,346 @@
+/* =========================================================
+   Weather Visuals & Responsive Polish (#7)
+   New file. It loads AFTER style.css, so no existing CSS or HTML is edited.
+   It styles the markup that ui.js already outputs.
+   ========================================================= */
+
+/* 1. Weather themes: ui.js sets body[data-theme] */
+
+body[data-theme="clear"] {
+    --accent: #ffd479;
+    --accent-strong: #f5b942;
+    --accent-hover: #ffe29e;
+    --focus: #f2b134;
+    --link: #ffd479;
+    --mi-focus: #f2b134;
+    --bg-image:
+        radial-gradient(circle at 88% 6%, rgb(255 205 90 / 0.38), transparent 42%),
+        var(--grad-clear);
+}
+
+body[data-theme="cloudy"] {
+    --accent: #c5d1e0;
+    --accent-strong: #aab9cc;
+    --accent-hover: #d6dfeb;
+    --focus: #8fa8c8;
+    --link: #c5d1e0;
+    --mi-focus: #8fa8c8;
+    --bg-image:
+        radial-gradient(ellipse at 12% 8%, rgb(190 205 225 / 0.22), transparent 46%),
+        radial-gradient(ellipse at 92% 28%, rgb(150 168 195 / 0.18), transparent 50%),
+        var(--grad-cloudy);
+}
+
+body[data-theme="rain"] {
+    --accent: #8fc7f2;
+    --accent-strong: #6fb2e8;
+    --accent-hover: #a9d6f6;
+    --focus: #5ca8e6;
+    --link: #8fc7f2;
+    --mi-focus: #5ca8e6;
+    --bg-image:
+        repeating-linear-gradient(105deg, transparent 0 18px, rgb(140 190 245 / 0.07) 18px 19px),
+        var(--grad-rain);
+}
+
+body[data-theme="snow"] {
+    --accent: #d9eefb;
+    --accent-strong: #bfe0f4;
+    --accent-hover: #e8f5fd;
+    --focus: #9fd3f0;
+    --link: #d9eefb;
+    --mi-focus: #9fd3f0;
+    --bg-image:
+        radial-gradient(circle, rgb(255 255 255 / 0.28) 0 1.5px, transparent 2.5px),
+        radial-gradient(circle, rgb(255 255 255 / 0.18) 0 1px, transparent 2px),
+        var(--grad-snow);
+    background-size: 120px 120px, 70px 70px, 100% 100%;
+    background-position: 0 0, 35px 40px, 0 0;
+    background-repeat: repeat, repeat, no-repeat;
+}
+
+body[data-theme="storm"] {
+    --accent: #c6b3f2;
+    --accent-strong: #ac95e8;
+    --accent-hover: #d6c8f7;
+    --focus: #a78bf0;
+    --link: #c6b3f2;
+    --mi-focus: #a78bf0;
+    --bg-image:
+        radial-gradient(circle at 82% 0%, rgb(170 140 255 / 0.34), transparent 40%),
+        repeating-linear-gradient(105deg, transparent 0 22px, rgb(190 170 255 / 0.05) 22px 23px),
+        var(--grad-storm);
+}
+
+/* Light mode: darker links/focus rings so they stay readable */
+:root[data-mode="light"] body[data-theme="clear"] {
+    --accent-hover: #f7c45a;
+    --focus: #b9770e;
+    --link: #9a5b00;
+    --mi-focus: #b9770e;
+}
+
+:root[data-mode="light"] body[data-theme="cloudy"] {
+    --accent-hover: #b3c2d5;
+    --focus: #4f6d94;
+    --link: #3d5a80;
+    --mi-focus: #4f6d94;
+}
+
+:root[data-mode="light"] body[data-theme="rain"] {
+    --accent-hover: #7bb9e8;
+    --focus: #1f6fb5;
+    --link: #1a5f9e;
+    --mi-focus: #1f6fb5;
+    --bg-image:
+        repeating-linear-gradient(105deg, transparent 0 18px, rgb(50 100 165 / 0.07) 18px 19px),
+        var(--grad-rain);
+}
+
+:root[data-mode="light"] body[data-theme="snow"] {
+    --accent: #cfe8f7;
+    --accent-strong: #b5d9ef;
+    --accent-hover: #bddcf0;
+    --focus: #3a86b8;
+    --link: #2a6f9e;
+    --mi-focus: #3a86b8;
+    --bg-image:
+        radial-gradient(circle, rgb(110 165 210 / 0.35) 0 1.5px, transparent 2.5px),
+        radial-gradient(circle, rgb(110 165 210 / 0.22) 0 1px, transparent 2px),
+        var(--grad-snow);
+}
+
+:root[data-mode="light"] body[data-theme="storm"] {
+    --accent-hover: #b7a0ee;
+    --focus: #6b4fc4;
+    --link: #5a3fb0;
+    --mi-focus: #6b4fc4;
+}
+
+/* 2. Page, typography and header */
+
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden; /* safety net: the page never scrolls sideways */
+}
+
+img {
+    max-width: 100%;
+}
+
+.header {
+    padding-bottom: 18px;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--divider);
+}
+
+.weather-main {
+    gap: 18px;
+}
+
+
+/* 3. Current weather: the focal point of the page */
+
+#current-weather {
+    background: linear-gradient(165deg, var(--accent) 0%, var(--accent-strong) 100%);
+    border: 1px solid rgb(255 255 255 / 0.35);
+    box-shadow: 0 18px 40px -16px rgb(0 0 0 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+:root[data-mode="light"] #current-weather {
+    box-shadow: 0 16px 34px -14px rgb(30 50 80 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.5);
+}
+
+.current-header {
+    flex-wrap: wrap;
+    background: rgb(17 17 17 / 0.09);
+    font-size: 14px;
+    letter-spacing: 0.01em;
+}
+
+.current-temp {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
+.current-condition {
+    font-size: 18px;
+}
+
+.current-city {
+    font-size: 15px;
+    opacity: 0.8;
+    overflow-wrap: anywhere;
+}
+
+.current-details {
+    border-top: 1px solid rgb(17 17 17 / 0.14);
+    padding-top: 14px;
+}
+
+.current-details dt {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+.wx-icon--lg {
+    filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.18));
+}
+
+
+/* 4. Forecast cards */
+
+.forecast-card {
+    border-radius: 28px;
+}
+
+.forecast-day {
+    font-size: 14px;
+    letter-spacing: 0.02em;
+}
+
+.forecast-temp {
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* 5. Recent searches */
+
+#recent-searches {
+    border-top: 3px solid var(--accent);
+}
+
+#recent-searches h2 {
+    margin-bottom: 6px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--divider);
+    font-size: 17px;
+}
+
+.recent-city {
+    padding: 13px 15px;
+    border: 1px solid transparent;
+}
+
+.recent-city:hover {
+    border-color: var(--accent);
+}
+
+.recent-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.recent-meta {
+    flex-shrink: 0;
+}
+
+
+/* 6. Hover and focus states */
+
+.theme-toggle:hover,
+.unit-toggle:hover {
+    border-color: var(--accent);
+}
+
+.unit-toggle button:focus-visible {
+    outline-offset: -2px;
+}
+
+.recent-city:focus-visible,
+.error-action:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+/* 7. Theme-tinted cards (only in browsers that support color-mix) */
+
+@supports (background: color-mix(in srgb, red 50%, blue)) {
+    .forecast-card {
+        background: color-mix(in srgb, var(--accent) 9%, var(--card));
+        border-color: color-mix(in srgb, var(--accent) 28%, var(--border));
+    }
+
+    .forecast-day {
+        border-bottom-color: color-mix(in srgb, var(--accent) 25%, var(--divider));
+    }
+
+    .forecast-card:hover {
+        border-color: color-mix(in srgb, var(--accent) 65%, var(--border));
+    }
+
+    #recent-searches {
+        border-color: color-mix(in srgb, var(--accent) 22%, var(--border));
+        border-top-color: var(--accent);
+    }
+
+    .recent-city:hover {
+        background: color-mix(in srgb, var(--accent) 22%, var(--chip));
+    }
+
+    .search-field:focus-within {
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 35%, transparent);
+    }
+}
+
+
+/* 8. Responsive polish (wrapped in media queries so they never undo style.css) */
+
+@media (min-width: 481px) {
+    .current-temp {
+        font-size: 56px;
+    }
+}
+
+@media (min-width: 601px) {
+    .forecast-card {
+        box-shadow: 0 10px 24px -14px rgb(0 0 0 / 0.6);
+    }
+}
+
+@media (min-width: 1001px) and (max-width: 1060px) {
+    .forecast-card {
+        padding: 14px 6px 18px;
+    }
+
+    .forecast-card .wx-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .forecast-temp {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 1000px) {
+    #recent-searches {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: stretch;
+    }
+
+    #recent-searches h2 {
+        flex: 0 0 100%;
+    }
+
+    .recent-city {
+        flex: 1 1 180px;
+        width: auto;
+    }
+
+    .recent-empty {
+        flex: 1 1 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    #forecast {
+        padding-top: 8px;
+    }
+}
