@@ -15,6 +15,16 @@ export class CityNotFoundError extends Error {
     }
 }
 
+/** Thrown for network, timeout and HTTP failures. kind: network | timeout | rate-limit | server | http | bad-response */
+export class ApiError extends Error {
+    constructor(kind, status) {
+        super(`API error: ${kind}`);
+        this.name = "ApiError";
+        this.kind = kind;
+        this.status = status;
+    }
+}
+
 /** Fetches JSON, with a timeout and an HTTP status check. */
 async function getJson(url) {
     const controller = new AbortController();
@@ -24,10 +34,17 @@ async function getJson(url) {
         const response = await fetch(url, { signal: controller.signal });
 
         if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
+            if (response.status === 429) throw new ApiError("rate-limit", 429);
+            if (response.status >= 500) throw new ApiError("server", response.status);
+            throw new ApiError("http", response.status);
         }
 
         return await response.json();
+    } catch (error) {
+        if (error instanceof ApiError) throw error;
+        if (error.name === "AbortError") throw new ApiError("timeout");
+        if (error instanceof SyntaxError) throw new ApiError("bad-response");
+        throw new ApiError("network");
     } finally {
         clearTimeout(timer);
     }

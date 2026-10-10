@@ -57,10 +57,13 @@
 
     --shadow: none;
 
-    --loading-bg: #1b1b1f;
-    --loading-text: #aaa;
+    --text-soft: #b5b5bc;
+    --dashed: #3a3a42;
+
+    --loading-veil: rgb(15 15 18 / 0.6);
     --error-bg: #3a1f23;
     --error-text: #ffb4b4;
+    --error-border: #4a2a2f;
 
     /* Page backgrounds for each weather theme */
     --grad-clear:  linear-gradient(160deg, #3b3220 0%, #0f0f12 60%);
@@ -97,10 +100,13 @@
 
     --shadow: 0 6px 20px rgb(30 50 80 / 0.12);
 
-    --loading-bg: #ffffff;
-    --loading-text: #555b66;
+    --text-soft: #3a414d;
+    --dashed: #c3cad6;
+
+    --loading-veil: rgb(243 245 248 / 0.7);
     --error-bg: #fde8ea;
     --error-text: #8a1c2b;
+    --error-border: #f0b4bb;
 
     --grad-clear:  linear-gradient(160deg, #ffe9b8 0%, #f3f5f8 60%);
     --grad-cloudy: linear-gradient(160deg, #d9dfe8 0%, #f3f5f8 60%);
@@ -304,9 +310,21 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     background: var(--accent-hover);
 }
 
-#search-form button:disabled {
+/* Keeps the width steady when the text changes to "Searching…" */
+#search-form button {
+    min-width: 110px;
+}
+
+#search-form button:disabled,
+#search-form button:disabled:hover {
+    background: var(--accent);
     opacity: 0.6;
-    cursor: progress;
+    cursor: not-allowed;
+}
+
+#city-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .nav-actions {
@@ -423,28 +441,120 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 
 
 /* =========================
-   Loading / Error
+   Loading
+   #loading sits inside .weather-main (position: relative) and veils the weather area.
 ========================= */
 
-#loading,
+#loading {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    border-radius: var(--radius-lg);
+
+    background: var(--loading-veil);
+    backdrop-filter: blur(2px);
+    color: var(--text);
+    font-weight: 600;
+}
+
+.spinner {
+    width: 22px;
+    height: 22px;
+
+    border: 3px solid rgb(128 128 140 / 0.35);
+    border-top-color: var(--link);
+    border-radius: 50%;
+
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner {
+        animation-duration: 1.8s;
+    }
+}
+
+
+/* =========================
+   Error state
+   On error, the error card takes the weather area.
+========================= */
+
+.weather-main.has-error #current-weather,
+.weather-main.has-error #forecast {
+    display: none;
+}
+
 #error {
-    max-width: 1200px;
-    margin: 0 auto 16px;
-    padding: 14px 18px;
+    grid-column: 1 / -1;
+    min-height: 280px;
 
-    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 
+    padding: 32px 24px;
+
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    border: 1px solid var(--error-border);
+    box-shadow: var(--shadow);
     text-align: center;
 }
 
-#loading {
-    background: var(--loading-bg);
-    color: var(--loading-text);
-}
+.error-icon {
+    width: 44px;
+    height: 44px;
 
-#error {
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
     background: var(--error-bg);
     color: var(--error-text);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.error-title {
+    font-size: 20px;
+}
+
+.error-message {
+    max-width: 420px;
+
+    color: var(--text-soft);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.error-action {
+    margin-top: 8px;
+    padding: 10px 20px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: var(--accent);
+    color: var(--ink);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.error-action:hover {
+    background: var(--accent-hover);
 }
 
 
@@ -463,6 +573,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 }
 
 .weather-main {
+    position: relative;
     min-width: 0;
     min-height: 320px;
 
@@ -690,9 +801,42 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     color: var(--muted);
 }
 
+/* Empty state (no searches yet) */
 .recent-empty {
-    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+
+    padding: 24px 12px;
+
+    border: 1px dashed var(--dashed);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.empty-icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 4px;
+
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.recent-empty-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--chip-text);
+}
+
+.recent-empty-hint {
+    font-size: 13px;
     color: var(--muted);
+    line-height: 1.4;
 }
 
 
@@ -811,5 +955,9 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 
     #search-form button {
         width: 100%;
+    }
+
+    .current-temp {
+        font-size: 48px;
     }
 }
