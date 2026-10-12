@@ -754,6 +754,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     gap: 10px;
 
     padding: 20px;
+    max-height: 500px;
 
     border-radius: var(--radius-lg);
 
@@ -761,11 +762,14 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     border: 1px solid var(--border);
     box-shadow: var(--shadow);
     backdrop-filter: blur(6px);
+    
+    overflow-y: auto;
 }
 
 #recent-searches h2 {
     margin-bottom: 4px;
     font-size: 18px;
+    flex-shrink: 0;
 }
 
 .recent-city {
@@ -785,6 +789,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     text-align: left;
 
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .recent-city:hover {
@@ -796,9 +801,18 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     height: 36px;
 }
 
+.recent-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+}
+
 .recent-meta {
     font-size: 13px;
     color: var(--muted);
+    flex-shrink: 0;
 }
 
 /* Empty state (no searches yet) */
@@ -960,4 +974,66 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     .current-temp {
         font-size: 48px;
     }
+}
+
+
+/* =========================
+   Disambiguation Dropdown
+========================= */
+
+#disambiguation {
+    grid-column: 1 / -1;
+    
+    padding: 20px;
+    margin-bottom: 16px;
+    
+    border-radius: var(--radius-lg);
+    
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(6px);
+}
+
+.disambiguation-title {
+    margin-bottom: 16px;
+    font-size: 18px;
+    color: var(--text);
+}
+
+.disambiguation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.disambiguation-option {
+    width: 100%;
+    padding: 14px 16px;
+    
+    border: none;
+    border-radius: var(--radius-md);
+    
+    background: var(--chip);
+    color: var(--chip-text);
+    text-align: left;
+    
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.disambiguation-option:hover {
+    background: var(--chip-hover);
+}
+
+.disambiguation-name {
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.disambiguation-meta {
+    font-size: 13px;
+    color: var(--muted);
 }
