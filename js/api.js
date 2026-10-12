@@ -51,30 +51,31 @@ async function getJson(url) {
 }
 
 /**
- * City name -> { name, country, latitude, longitude }
+ * City name -> array of { name, country, latitude, longitude, admin1 }
+ * Returns up to 10 matches for disambiguation.
  * Throws CityNotFoundError when nothing matches.
  */
 export async function searchCity(name) {
     const params = new URLSearchParams({
         name,
-        count: "1",
+        count: "10",
         language: "en",
         format: "json"
     });
 
     const data = await getJson(`${GEOCODING_URL}?${params}`);
-    const match = data.results?.[0];
-
-    if (!match) {
+    
+    if (!data.results || data.results.length === 0) {
         throw new CityNotFoundError(name);
     }
 
-    return {
+    return data.results.map(match => ({
         name: match.name,
         country: match.country ?? "",
+        admin1: match.admin1 ?? "",
         latitude: match.latitude,
         longitude: match.longitude
-    };
+    }));
 }
 
 /**
@@ -82,6 +83,7 @@ export async function searchCity(name) {
  * forecast_days is 6 because day 1 is today (shown in the big card)
  * and the 5 cards show the days after it.
  * Temperatures come back in °C and wind in km/h (the API defaults).
+ * timezone="auto" returns timezone and utc_offset_seconds for the location.
  */
 export function fetchWeather({ latitude, longitude }) {
     const params = new URLSearchParams({
