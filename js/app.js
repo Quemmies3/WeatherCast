@@ -25,7 +25,7 @@ let lastSearch = null;    // the last search, so Retry can run it again
 
 /**
  * Runs one search from start to finish.
- * @param getLocation  async function that returns { name, country, latitude, longitude }
+ * @param getLocation  async function that returns { name, country, latitude, longitude } or array of locations
  */
 /** Turns any error into what the user should see. */
 function describeError(error) {
@@ -73,7 +73,21 @@ async function runSearch(getLocation) {
     let failure = null;
 
     try {
-        const location = await getLocation();
+        const locationOrArray = await getLocation();
+        
+        // If we get multiple locations, show disambiguation dropdown
+        if (Array.isArray(locationOrArray)) {
+            if (requestId !== latestRequest) return;
+            
+            ui.showLoading(false);
+            ui.showDisambiguation(locationOrArray, (selectedLocation) => {
+                ui.hideDisambiguation();
+                runSearch(async () => selectedLocation);
+            });
+            return;
+        }
+        
+        const location = locationOrArray;
         const raw = await fetchWeather(location);
 
         if (requestId !== latestRequest) return; // a newer search has started
@@ -112,12 +126,16 @@ searchForm.addEventListener("submit", (event) => {
     const city = cityInput.value.trim();
 
     if (city.length < 2) {
-    cityInput.setCustomValidity("Enter at least 2 characters.");
-    cityInput.reportValidity();
-    return;
-}
+        cityInput.setCustomValidity("Enter at least 2 characters.");
+        cityInput.reportValidity();
+        return;
+    }
 
-    runSearch(() => searchCity(city));
+    runSearch(async () => {
+        const results = await searchCity(city);
+        // If only one result, return it directly; otherwise return array for disambiguation
+        return results.length === 1 ? results[0] : results;
+    });
 });
 
 cityInput.addEventListener("input", () => cityInput.setCustomValidity(""));

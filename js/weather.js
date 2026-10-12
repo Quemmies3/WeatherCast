@@ -176,6 +176,9 @@ export function buildWeatherData(location, raw) {
             weatherCode: current.weather_code,
             isDay: current.is_day
         },
+        // Store timezone info for live clock
+        timezone: raw.timezone,
+        utcOffsetSeconds: raw.utc_offset_seconds,
         // The first entry is today (shown in the big card), so the cards show the next 5 days.
         daily: allDays.slice(1, 6)
     };

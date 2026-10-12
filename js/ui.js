@@ -28,6 +28,12 @@ const fahrenheitBtn = document.getElementById("fahrenheit-btn");
 const themeToggle = document.getElementById("theme-toggle");
 const locationText = document.getElementById("location-text");
 
+// Create disambiguation dropdown element
+const disambiguationEl = document.createElement("div");
+disambiguationEl.id = "disambiguation";
+disambiguationEl.hidden = true;
+document.querySelector(".dashboard").prepend(disambiguationEl);
+
 
 // =========================
 // Small helpers
@@ -149,8 +155,45 @@ export function setTheme(theme) {
     document.body.dataset.theme = theme;
 }
 
+// Store clock interval ID and current data for updates
+let clockInterval = null;
+let currentWeatherData = null;
+
+function updateClock() {
+    if (!currentWeatherData) return;
+
+    const { timezone, utcOffsetSeconds } = currentWeatherData;
+    const now = new Date();
+    
+    // Calculate the local time at the searched location
+    const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const localTime = new Date(utcTime + (utcOffsetSeconds * 1000));
+    
+    const day = localTime.toLocaleDateString("en-US", { weekday: "long" });
+    const hours = localTime.getHours();
+    const minutes = localTime.getMinutes();
+    const hour12 = ((hours + 11) % 12) + 1;
+    const suffix = hours >= 12 ? "PM" : "AM";
+    const time = `${hour12}:${String(minutes).padStart(2, "0")} ${suffix}`;
+
+    const dayEl = currentEl.querySelector(".current-day");
+    const timeEl = currentEl.querySelector(".current-time");
+    
+    if (dayEl) dayEl.textContent = day;
+    if (timeEl) timeEl.textContent = time;
+}
+
 export function renderCurrent(data, unit) {
     const { location, current } = data;
+    
+    // Store data for clock updates
+    currentWeatherData = data;
+    
+    // Clear any existing clock interval
+    if (clockInterval) {
+        clearInterval(clockInterval);
+    }
+
     const { day, time } = formatLocalDayTime(current.time);
 
     const header = el("div", "current-header");
@@ -178,6 +221,11 @@ export function renderCurrent(data, unit) {
     );
 
     currentEl.replaceChildren(header, body);
+    
+    // Start live clock updating every second
+    clockInterval = setInterval(updateClock, 1000);
+    // Update immediately to show correct time
+    updateClock();
 }
 
 export function renderForecast(daily, unit) {
@@ -241,16 +289,16 @@ export function renderRecent(list, onSelect) {
     // Keep the <h2>; remove only what we added before.
     recentEl.querySelectorAll(".recent-city, .recent-empty").forEach((node) => node.remove());
 
-   if (list.length === 0) {
-    const empty = el("div", "recent-empty");
-    empty.append(
-        makeClockIcon(),
-        el("p", "recent-empty-title", "No recent searches"),
-        el("p", "recent-empty-hint", "Cities you search for will show up here.")
-    );
-    recentEl.append(empty);
-    return;
-}
+    if (list.length === 0) {
+        const empty = el("div", "recent-empty");
+        empty.append(
+            makeClockIcon(),
+            el("p", "recent-empty-title", "No recent searches"),
+            el("p", "recent-empty-hint", "Cities you search for will show up here.")
+        );
+        recentEl.append(empty);
+        return;
+    }
 
     list.forEach((location) => {
         const button = el("button", "recent-city");
@@ -264,4 +312,45 @@ export function renderRecent(list, onSelect) {
         button.addEventListener("click", () => onSelect(location));
         recentEl.append(button);
     });
+}
+
+
+// =========================
+// Disambiguation dropdown
+// =========================
+
+/**
+ * Shows a dropdown of matching cities for the user to choose from
+ * @param locations  array of { name, country, admin1, latitude, longitude }
+ * @param onSelect   called with the chosen location
+ */
+export function showDisambiguation(locations, onSelect) {
+    const title = el("h3", "disambiguation-title", "Multiple locations found. Choose one:");
+    
+    const list = el("div", "disambiguation-list");
+    
+    locations.forEach((location) => {
+        const button = el("button", "disambiguation-option");
+        button.type = "button";
+        
+        const nameEl = el("div", "disambiguation-name", location.name);
+        const parts = [location.admin1, location.country].filter(Boolean);
+        const metaText = parts.join(", ");
+        
+        button.append(nameEl);
+        if (metaText) {
+            button.append(el("div", "disambiguation-meta", metaText));
+        }
+        
+        button.addEventListener("click", () => onSelect(location));
+        list.append(button);
+    });
+    
+    disambiguationEl.replaceChildren(title, list);
+    disambiguationEl.hidden = false;
+}
+
+export function hideDisambiguation() {
+    disambiguationEl.hidden = true;
+    disambiguationEl.replaceChildren();
 }
