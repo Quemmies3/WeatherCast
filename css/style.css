@@ -60,6 +60,10 @@
     --text-soft: #b5b5bc;
     --dashed: #3a3a42;
 
+    --viz-track: rgb(255 255 255 / 0.12);
+    --tab-muted: #cfcfd4;
+    --lift-shadow: rgb(0 0 0 / 0.45);
+
     --loading-veil: rgb(15 15 18 / 0.6);
     --error-bg: #3a1f23;
     --error-text: #ffb4b4;
@@ -80,7 +84,7 @@
     color-scheme: light;
 
     --bg: #f3f5f8;
-    --card: rgb(255 255 255 / 0.85);
+    --card: rgb(232 240 250 / 0.92);
     --field-bg: #ffffff;
     --field-border: #cfd5df;
     --chip: #eef1f6;
@@ -102,6 +106,10 @@
 
     --text-soft: #3a414d;
     --dashed: #c3cad6;
+
+    --viz-track: rgb(30 60 100 / 0.14);
+    --tab-muted: #4d5461;
+    --lift-shadow: rgb(40 80 130 / 0.28);
 
     --loading-veil: rgb(243 245 248 / 0.7);
     --error-bg: #fde8ea;
@@ -761,11 +769,14 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     border: 1px solid var(--border);
     box-shadow: var(--shadow);
     backdrop-filter: blur(6px);
+
+    overflow-y: auto;
 }
 
 #recent-searches h2 {
     margin-bottom: 4px;
     font-size: 18px;
+    flex-shrink: 0;
 }
 
 .recent-city {
@@ -785,6 +796,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     text-align: left;
 
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .recent-city:hover {
@@ -796,9 +808,18 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     height: 36px;
 }
 
+.recent-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+}
+
 .recent-meta {
     font-size: 13px;
     color: var(--muted);
+    flex-shrink: 0;
 }
 
 /* Empty state (no searches yet) */
@@ -854,6 +875,470 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 
 .attribution a {
     color: var(--link);
+}
+
+
+/* =========================
+   Contrast fixes
+   Written with extra-specific selectors so they win over weather-visuals.css
+   no matter which stylesheet loads last.
+========================= */
+
+/* 1. White weather icons need a thin dark edge on pale backgrounds:
+      - light mode: every icon sits on a pale surface
+      - both modes: the big icon in the main card sits on the pale weather card */
+:root[data-mode="light"] .wx-icon,
+:root[data-mode="light"] .brand-icon,
+#current-weather .wx-icon--lg {
+    filter:
+        drop-shadow(0 0 1px rgb(15 45 85 / 0.95))
+        drop-shadow(0 0 2px rgb(15 45 85 / 0.6))
+        drop-shadow(0 3px 4px rgb(15 45 85 / 0.3));
+}
+
+/* 2. Light mode: forecast cards are slightly blue (the other cards get the same
+      blue from the --card colour at the top of this file) */
+:root[data-mode="light"] #forecast .forecast-card {
+    background: linear-gradient(180deg, #cde0f3 0%, #e8f1fa 100%);
+}
+
+/* 3. Small labels that were too faint */
+#forecast .forecast-range {
+    color: var(--text-soft);
+}
+
+.recent-city:hover .recent-meta,
+.recent-city:hover .recent-condition {
+    color: var(--chip-text);
+}
+
+
+/* =========================
+   Charts and line art follow the weather colour
+   (declared on body so it picks up the themed --link)
+========================= */
+
+body {
+    --viz: var(--link);
+}
+
+
+/* =========================
+   Forecast tabs: Today | Tomorrow | Next 5 days
+========================= */
+
+/* Rows keep their natural height when the sidebar is taller, instead of stretching */
+.weather-main {
+    align-content: start;
+}
+
+.view-tabs {
+    grid-column: 1 / -1;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 6px 26px;
+}
+
+.view-tab {
+    padding: 6px 2px;
+
+    border: none;
+    border-bottom: 3px solid transparent;
+
+    background: none;
+    color: var(--tab-muted);
+
+    font-size: 17px;
+    cursor: pointer;
+}
+
+/* the page-wide button hover lift and shadow don't suit a text tab */
+.view-tab:hover:not(:disabled) {
+    color: var(--text);
+    transform: none;
+    box-shadow: none;
+}
+
+.view-tab[aria-selected="true"] {
+    color: var(--text);
+    font-weight: 700;
+    border-bottom-color: var(--link);
+}
+
+.weather-main.has-error .view-tabs,
+.weather-main.has-error #overview {
+    display: none;
+}
+
+
+/* =========================
+   Main card: six details like the design
+========================= */
+
+.current-details dd {
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================
+   Forecast cards: hover and the "not available" message
+========================= */
+
+#forecast .forecast-card {
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+#forecast .forecast-card .wx-icon {
+    transition: transform 0.22s ease;
+}
+
+/* Only on devices with a real hover, so touch screens don't get a stuck hover state */
+@media (hover: hover) and (pointer: fine) {
+    #forecast .forecast-card:hover {
+        transform: translateY(-6px);
+        border-color: var(--link);
+        box-shadow: 0 14px 28px var(--lift-shadow);
+    }
+
+    #forecast .forecast-card:hover .wx-icon {
+        transform: translateY(-2px) scale(1.1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #forecast .forecast-card,
+    #forecast .forecast-card .wx-icon {
+        transition: none;
+    }
+
+    #forecast .forecast-card:hover,
+    #forecast .forecast-card:hover .wx-icon {
+        transform: none;
+    }
+}
+
+.forecast-empty {
+    grid-column: 1 / -1;
+    align-self: center;
+
+    padding: 24px;
+
+    color: var(--muted);
+    text-align: center;
+}
+
+
+/* =========================
+   Today's Overview tiles
+========================= */
+
+#overview {
+    grid-column: 1 / -1;
+}
+
+.overview-title {
+    margin: 10px 0 12px;
+    font-size: 18px;
+}
+
+.tiles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.tile {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    min-height: 196px;
+    padding: 18px;
+
+    border-radius: var(--radius-md);
+
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(6px);
+}
+
+.tile-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.tile-sub {
+    margin-top: -4px;
+
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.tile-visual {
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 72px;
+}
+
+.tile-foot {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.tile-value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.tile-value small {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+}
+
+.tile-note {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: right;
+}
+
+/* Wind: one bar per hour, the current hour is the left-most and brightest */
+.wind-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+
+    width: 100%;
+    height: 72px;
+}
+
+.wind-bar {
+    flex: 1;
+    min-width: 0;
+
+    border-radius: 3px 3px 1px 1px;
+    background: linear-gradient(to top, transparent, var(--viz));
+    opacity: 0.55;
+}
+
+.wind-bar:first-child {
+    opacity: 1;
+}
+
+/* UV: half-circle gauge */
+.uv-gauge {
+    width: 100%;
+    max-width: 150px;
+    height: auto;
+    overflow: visible;
+}
+
+.gauge-track,
+.gauge-fill {
+    fill: none;
+    stroke-width: 9;
+    stroke-linecap: round;
+}
+
+.gauge-track {
+    stroke: var(--viz-track);
+}
+
+.gauge-fill {
+    stroke: var(--viz);
+}
+
+/* Humidity and visibility: a large line icon */
+.tile-icon {
+    width: 64px;
+    height: 64px;
+
+    fill: none;
+    stroke: var(--viz);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+/* =========================
+   Sidebar: Chance of Rain, then Recent Searches
+========================= */
+
+.sidebar {
+    position: relative;
+    min-width: 0;
+}
+
+/* the recent-searches panel was align-self: start on its own; inside the sidebar it fills the width */
+.sidebar #recent-searches {
+    align-self: stretch;
+}
+
+#rain {
+    padding: 20px;
+
+    border-radius: var(--radius-lg);
+
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(6px);
+}
+
+.rain-title {
+    font-size: 17px;
+}
+
+.rain-sub {
+    margin: 2px 0 12px;
+    padding-bottom: 10px;
+
+    border-bottom: 1px solid var(--divider);
+
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.rain-chart {
+    display: flex;
+    min-height: 120px;
+}
+
+.rain-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.rain-grid {
+    stroke: var(--viz-track);
+    stroke-width: 1;
+    stroke-dasharray: 2 3;
+}
+
+.rain-axis {
+    fill: var(--muted);
+    font-size: 10px;
+}
+
+.rain-bar {
+    fill: var(--viz);
+    opacity: 0.55;
+}
+
+.rain-line {
+    fill: none;
+    stroke: var(--viz);
+    stroke-width: 1.6;
+}
+
+.rain-dot {
+    fill: var(--viz);
+    stroke: var(--field-bg);
+    stroke-width: 1.5;
+}
+
+.rain-empty {
+    margin: auto;
+    padding: 24px 8px;
+
+    font-size: 14px;
+    color: var(--muted);
+    text-align: center;
+}
+
+
+/* =========================
+   Recent searches: "Other Cities" style cards
+========================= */
+
+.recent-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+
+    min-width: 0;
+    text-align: left;
+}
+
+.recent-meta {
+    font-size: 12px;
+}
+
+.recent-name {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.recent-condition {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.recent-side {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    flex-shrink: 0;
+}
+
+.recent-temp {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+
+/* =========================
+   Dashboard: smaller screens
+========================= */
+
+@media (max-width: 1000px) {
+    /* rain chart and recent searches sit side by side when there is room */
+    .sidebar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    /* the two panels share a row height: keep the recent searches at the top
+       instead of spreading them out */
+    #recent-searches {
+        align-content: flex-start;
+    }
+}
+
+@media (max-width: 800px) {
+    .tiles {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .forecast-empty {
+        flex: 1 0 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .wind-bars {
+        gap: 2px;
+    }
+
+    .tile {
+        padding: 14px;
+    }
 }
 
 
@@ -960,4 +1445,65 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     .current-temp {
         font-size: 48px;
     }
+}
+
+/* =========================
+   Disambiguation Dropdown
+========================= */
+
+#disambiguation {
+    grid-column: 1 / -1;
+    
+    padding: 20px;
+    margin-bottom: 16px;
+    
+    border-radius: var(--radius-lg);
+    
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(6px);
+}
+
+.disambiguation-title {
+    margin-bottom: 16px;
+    font-size: 18px;
+    color: var(--text);
+}
+
+.disambiguation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.disambiguation-option {
+    width: 100%;
+    padding: 14px 16px;
+    
+    border: none;
+    border-radius: var(--radius-md);
+    
+    background: var(--chip);
+    color: var(--chip-text);
+    text-align: left;
+    
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.disambiguation-option:hover {
+    background: var(--chip-hover);
+}
+
+.disambiguation-name {
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.disambiguation-meta {
+    font-size: 13px;
+    color: var(--muted);
 }

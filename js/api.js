@@ -51,30 +51,31 @@ async function getJson(url) {
 }
 
 /**
- * City name -> { name, country, latitude, longitude }
+ * City name -> array of { name, country, latitude, longitude, admin1 }
+ * Returns up to 10 matches for disambiguation.
  * Throws CityNotFoundError when nothing matches.
  */
 export async function searchCity(name) {
     const params = new URLSearchParams({
         name,
-        count: "1",
+        count: "10",
         language: "en",
         format: "json"
     });
 
     const data = await getJson(`${GEOCODING_URL}?${params}`);
-    const match = data.results?.[0];
-
-    if (!match) {
+    
+    if (!data.results || data.results.length === 0) {
         throw new CityNotFoundError(name);
     }
 
-    return {
+    return data.results.map(match => ({
         name: match.name,
         country: match.country ?? "",
+        admin1: match.admin1 ?? "",
         latitude: match.latitude,
         longitude: match.longitude
-    };
+    }));
 }
 
 /**
@@ -87,10 +88,26 @@ export function fetchWeather({ latitude, longitude }) {
     const params = new URLSearchParams({
         latitude: String(latitude),
         longitude: String(longitude),
-        current: "temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,is_day",
-        daily: "weather_code,temperature_2m_max,temperature_2m_min",
+        current: "temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,pressure_msl,wind_speed_10m,wind_direction_10m,visibility,weather_code,is_day",
+        daily: "weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max",
+        hourly: "temperature_2m,weather_code,is_day,wind_speed_10m,precipitation_probability",
         timezone: "auto",
         forecast_days: "6"
+    });
+
+    return getJson(`${FORECAST_URL}?${params}`);
+}
+
+/**
+ * Current conditions for several cities in ONE request (used by the recent-searches list).
+ * With one location the API returns an object, with several it returns a list;
+ * weather.js (parseOtherCities) handles both.
+ */
+export function fetchOtherCities(locations) {
+    const params = new URLSearchParams({
+        latitude: locations.map((place) => place.latitude).join(","),
+        longitude: locations.map((place) => place.longitude).join(","),
+        current: "temperature_2m,weather_code,is_day"
     });
 
     return getJson(`${FORECAST_URL}?${params}`);

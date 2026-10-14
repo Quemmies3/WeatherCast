@@ -27,14 +27,18 @@ A responsive weather dashboard providing real-time weather conditions and 5-day 
 ```text
 WeatherCast/
 ├── assets/
+│   └── icons
 ├── css/
 │   └── style.css
+│   └── micro-interactions.css
+│   └── weather-visuals.css
 ├── js/
 │   ├── api.js
 │   ├── app.js
 │   ├── storage.js
 │   ├── weather.js
 │   └── ui.js
+│   └── micro-interactions.js
 ├── index.html
 ├── .gitignore
 └── README.md
@@ -60,19 +64,19 @@ We welcome contributions from all team members.
 ### Branches
 
 - `main` — stable, release-ready code
-- `develop` — development and integration branch
+- `dev` — development and integration branch
 - `feature/*` — individual feature development
 - `fix/*` — bug fixes
 
 ### Workflow
 
-1. Pull the latest changes from `develop`.
+1. Pull the latest changes from `dev`.
 2. Create a branch for your work.
 3. Make and test your changes.
 4. Commit and push your branch.
-5. Open a Pull Request into `develop`.
+5. Open a Pull Request into `dev`.
 6. Have your changes reviewed before merging.
-7. Once `develop` is stable, it will be merged into `main`.
+7. Once `dev` is stable, it will be merged into `main`.
 
 ### Branch Naming
 
