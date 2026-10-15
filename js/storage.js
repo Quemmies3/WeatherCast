@@ -4,7 +4,7 @@
 const RECENT_KEY = "weathercast:recent";
 const UNIT_KEY = "weathercast:unit";
 const MODE_KEY = "weathercast:mode"; // plain text ("light"/"dark"); index.html reads this key before the page paints
-const MAX_RECENT = 5;
+const MAX_RECENT = 5; // Limit to 5 most recent searches
 
 // Storage can fail (private mode, blocked cookies, corrupted data),
 // so every read/write is wrapped and falls back safely.
