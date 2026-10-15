@@ -647,7 +647,11 @@ export function showDisambiguation(locations, onSelect) {
         button.type = "button";
         
         const nameEl = el("div", "disambiguation-name", location.name);
-        const parts = [location.admin1, location.country].filter(Boolean);
+        
+        // Build "region, country" or just "country" if no region
+        const parts = [];
+        if (location.admin1) parts.push(location.admin1);
+        if (location.country) parts.push(location.country);
         const metaText = parts.join(", ");
         
         button.append(nameEl);
