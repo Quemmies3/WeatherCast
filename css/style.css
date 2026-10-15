@@ -1315,6 +1315,10 @@ body {
 ========================= */
 
 @media (max-width: 1000px) {
+
+    body { max-height: none; overflow-y: visible; }
+    .dashboard, .weather-main, .sidebar { max-height: none; overflow: visible; }
+
     /* rain chart and recent searches sit side by side when there is room */
     .sidebar {
         display: grid;
