@@ -201,7 +201,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .logo {
@@ -581,7 +581,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 
     display: grid;
     grid-template-columns: minmax(0, 1fr) 280px;
-    gap: 10px;
+    gap: 8px;
 }
 
 .weather-main {
@@ -593,7 +593,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 
     display: grid;
     grid-template-columns: minmax(160px, 1.3fr) 5fr;
-    gap: 10px;
+    gap: 8px;
 }
 
 
@@ -615,7 +615,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 }
 
 #current-weather .placeholder {
-    padding: 16px;
+    padding: 14px;
     color: rgb(17 17 17 / 0.6);
 }
 
@@ -624,7 +624,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     justify-content: space-between;
     gap: 4px;
 
-    padding: 10px 12px;
+    padding: 8px 12px;
 
     background: var(--accent-strong);
     font-weight: 600;
@@ -703,9 +703,9 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 }
 
 .forecast-card {
-    padding: 10px 6px 14px;
+    padding: 8px 4px 10px;
 
-    border-radius: 20px;
+    border-radius: 22px;
 
     background: var(--card);
     border: 1px solid var(--border);
@@ -721,12 +721,12 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 
 .forecast-day {
     width: 100%;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
 
     border-bottom: 1px solid var(--divider);
 
     text-align: center;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
 }
 
@@ -766,10 +766,9 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
 
-    padding: 12px;
-    max-height: 320px;
+    padding: 8px;
 
     border-radius: var(--radius-lg);
 
@@ -782,8 +781,8 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 }
 
 #recent-searches h2 {
-    margin-bottom: 3px;
-    font-size: 15px;
+    margin-bottom: 2px;
+    font-size: 12px;
     flex-shrink: 0;
 }
 
@@ -791,10 +790,10 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 6px;
+    gap: 3px;
 
     width: 100%;
-    padding: 6px 8px;
+    padding: 4px 5px;
 
     border: none;
     border-radius: var(--radius-md);
@@ -813,7 +812,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 
 .recent-city .wx-icon {
     width: 24px;
-    height: 24px;
+    height: 20px;
 }
 
 .recent-name {
@@ -825,7 +824,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 }
 
 .recent-meta {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--muted);
     flex-shrink: 0;
 }
@@ -875,7 +874,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 
 .attribution {
     max-width: 1200px;
-    margin: 32px auto 0;
+    margin: 26px auto 0;
 
     font-size: 13px;
     color: var(--muted);
@@ -1064,7 +1063,7 @@ body {
     gap: 4px;
 
     min-height: 140px;
-    padding: 12px;
+    padding: 10px;
 
     border-radius: var(--radius-md);
 

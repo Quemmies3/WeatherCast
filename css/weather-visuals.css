@@ -130,13 +130,13 @@ img {
 }
 
 .header {
-    padding-bottom: 18px;
-    margin-bottom: 28px;
+    padding-bottom: 12px;
+    margin-bottom: 22px;
     border-bottom: 1px solid var(--divider);
 }
 
 .weather-main {
-    gap: 18px;
+    gap: 16px;
 }
 
 
@@ -165,7 +165,7 @@ img {
 }
 
 .current-condition {
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .current-city {
@@ -176,7 +176,7 @@ img {
 
 .current-details {
     border-top: 1px solid rgb(17 17 17 / 0.14);
-    padding-top: 14px;
+    padding-top: 12px;
 }
 
 .current-details dt {
@@ -194,7 +194,7 @@ img {
 /* 4. Forecast cards */
 
 .forecast-card {
-    border-radius: 28px;
+    border-radius: 26px;
 }
 
 .forecast-day {
@@ -215,13 +215,13 @@ img {
 
 #recent-searches h2 {
     margin-bottom: 6px;
-    padding-bottom: 10px;
+    padding-bottom: 8px;
     border-bottom: 1px solid var(--divider);
-    font-size: 17px;
+    font-size: 15px;
 }
 
 .recent-city {
-    padding: 13px 15px;
+    padding: 8px 10px;
     border: 1px solid transparent;
 }
 
