@@ -51,31 +51,104 @@ async function getJson(url) {
 }
 
 /**
- * City name -> array of { name, country, latitude, longitude, admin1 }
- * Returns up to 10 matches for disambiguation.
+ * City name -> array of { name, country, latitude, longitude, admin1, featureCode }
+ * Returns Nigerian locations first, with exact state name matching.
  * Throws CityNotFoundError when nothing matches.
  */
 export async function searchCity(name) {
     const params = new URLSearchParams({
         name,
-        count: "10",
+        count: "100", // Get more results to ensure Nigerian matches
         language: "en",
         format: "json"
     });
 
     const data = await getJson(`${GEOCODING_URL}?${params}`);
     
+    console.log("🔍 Geocoding API response for '" + name + "':", data);
+    
     if (!data.results || data.results.length === 0) {
         throw new CityNotFoundError(name);
     }
 
-    return data.results.map(match => ({
+    // Map all results
+    const mapped = data.results.map(match => ({
         name: match.name,
         country: match.country ?? "",
         admin1: match.admin1 ?? "",
         latitude: match.latitude,
-        longitude: match.longitude
+        longitude: match.longitude,
+        featureCode: match.feature_code ?? ""
     }));
+
+    const searchLower = name.toLowerCase().trim();
+    
+    // Nigerian states list for smart matching
+    const nigerianStates = [
+        "abia", "adamawa", "akwa ibom", "anambra", "bauchi", "bayelsa", "benue", 
+        "borno", "cross river", "delta", "ebonyi", "edo", "ekiti", "enugu", "gombe",
+        "imo", "jigawa", "kaduna", "kano", "katsina", "kebbi", "kogi", "kwara",
+        "lagos", "nasarawa", "niger", "ogun", "ondo", "osun", "oyo", "plateau",
+        "rivers", "sokoto", "taraba", "yobe", "zamfara", "fct"
+    ];
+    
+    const isStateName = nigerianStates.includes(searchLower);
+    
+    // Filter and rank with INTELLIGENT state matching
+    return mapped
+        .filter(location => {
+            const isNigeria = location.country.toLowerCase() === "nigeria";
+            const nameLower = location.name.toLowerCase();
+            const admin1Lower = location.admin1.toLowerCase();
+            
+            // If searching for a Nigerian state name
+            if (isStateName && isNigeria) {
+                // ONLY show if:
+                // 1. The location name matches the state (e.g., "Ogun" = "Ogun State")
+                // 2. OR the admin1 field contains the state name (e.g., admin1="Ogun State")
+                const nameMatchesState = nameLower === searchLower || nameLower.includes(searchLower + " state");
+                const admin1MatchesState = admin1Lower.includes(searchLower);
+                return nameMatchesState || admin1MatchesState;
+            }
+            
+            // Always include other Nigerian locations if not searching for a state
+            if (isNigeria) return true;
+            
+            // For non-Nigerian: only include if exact name match
+            return nameLower === searchLower;
+        })
+        .sort((a, b) => {
+            const aIsNigeria = a.country.toLowerCase() === "nigeria";
+            const bIsNigeria = b.country.toLowerCase() === "nigeria";
+            
+            // 1. NIGERIA FIRST - always
+            if (aIsNigeria && !bIsNigeria) return -1;
+            if (!aIsNigeria && bIsNigeria) return 1;
+            
+            // 2. For Nigerian results: exact name match first
+            const aNameMatch = a.name.toLowerCase() === searchLower;
+            const bNameMatch = b.name.toLowerCase() === searchLower;
+            
+            if (aNameMatch && !bNameMatch) return -1;
+            if (!aNameMatch && bNameMatch) return 1;
+            
+            // 3. State-level (ADM1) before cities
+            const aIsState = a.featureCode === "ADM1";
+            const bIsState = b.featureCode === "ADM1";
+            
+            if (aIsState && !bIsState) return -1;
+            if (!aIsState && bIsState) return 1;
+            
+            // 4. Capitals and major cities
+            const aIsCapital = a.featureCode.startsWith("PPLC") || a.featureCode === "PPLA";
+            const bIsCapital = b.featureCode.startsWith("PPLC") || b.featureCode === "PPLA";
+            
+            if (aIsCapital && !bIsCapital) return -1;
+            if (!aIsCapital && bIsCapital) return 1;
+            
+            return 0;
+        })
+        .slice(0, 15); // Top 15 after filtering
 }
 
 /**
