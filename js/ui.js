@@ -192,8 +192,9 @@ function updateClock() {
     const dayEl = currentEl.querySelector(".current-day");
     const timeEl = currentEl.querySelector(".current-time");
     
-    if (dayEl) dayEl.textContent = day;
-    if (timeEl) timeEl.textContent = time;
+    // Only update DOM if the values actually changed (prevents blinking)
+    if (dayEl && dayEl.textContent !== day) dayEl.textContent = day;
+    if (timeEl && timeEl.textContent !== time) timeEl.textContent = time;
 }
 
 export function renderCurrent(data, unit) {
@@ -628,11 +629,20 @@ export function renderRecent(list, onSelect, conditions = [], unit = "celsius") 
  * @param onSelect   called with the chosen location
  */
 export function showDisambiguation(locations, onSelect) {
+    // Remove duplicates based on name, country, and admin1
+    const seen = new Set();
+    const uniqueLocations = locations.filter((location) => {
+        const key = `${location.name}|${location.country}|${location.admin1}`.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+
     const title = el("h3", "disambiguation-title", "Multiple locations found. Choose one:");
     
     const list = el("div", "disambiguation-list");
     
-    locations.forEach((location) => {
+    uniqueLocations.forEach((location) => {
         const button = el("button", "disambiguation-option");
         button.type = "button";
         

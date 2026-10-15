@@ -146,7 +146,7 @@ body {
     background-repeat: no-repeat;
     color: var(--text);
     font-family: Arial, Helvetica, sans-serif;
-    padding: 24px;
+    padding: 16px 20px;
 }
 
 button,
@@ -194,8 +194,8 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 ========================= */
 
 .header {
-    max-width: 1200px;
-    margin: 0 auto 24px;
+    max-width: 1400px;
+    margin: 0 auto 20px;
 
     display: flex;
     align-items: center;
@@ -572,21 +572,21 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 ========================= */
 
 .dashboard {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
 
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 280px;
-    gap: 24px;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 20px;
 }
 
 .weather-main {
     position: relative;
     min-width: 0;
-    min-height: 320px;
+    min-height: 280px;
 
     display: grid;
-    grid-template-columns: minmax(210px, 1.7fr) 5fr;
+    grid-template-columns: minmax(200px, 1.5fr) 5fr;
     gap: 16px;
 }
 
@@ -696,9 +696,9 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 }
 
 .forecast-card {
-    padding: 18px 10px 22px;
+    padding: 16px 10px 20px;
 
-    border-radius: 32px;
+    border-radius: 28px;
 
     background: var(--card);
     border: 1px solid var(--border);
@@ -709,7 +709,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
 }
 
 .forecast-day {
@@ -762,7 +762,7 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
     gap: 10px;
 
     padding: 20px;
-    max-height: 500px;
+    max-height: 450px;
 
     border-radius: var(--radius-lg);
 
