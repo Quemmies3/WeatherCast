@@ -1,7 +1,7 @@
 // app.js
 // Coordinates the app: connects the form and buttons to api, weather, storage and ui.
 
-import { searchCity, fetchWeather, fetchOtherCities, CityNotFoundError, ApiError } from "./api.js";
+import { searchCity, fetchWeather, fetchOtherCities, reverseGeocode, CityNotFoundError, ApiError } from "./api.js";
 import { buildWeatherData, parseOtherCities } from "./weather.js";
 import * as storage from "./storage.js";
 import * as ui from "./ui.js";
@@ -87,6 +87,7 @@ async function runSearch(getLocation) {
             
             ui.showLoading(false);
             ui.showDisambiguation(locationOrArray, (selectedLocation) => {
+                cityInput.value = "";
                 ui.hideDisambiguation();
                 runSearch(async () => selectedLocation);
             });
@@ -167,8 +168,13 @@ searchForm.addEventListener("submit", (event) => {
         return;
     }
 
+    // Read query into variable, then clear input and close dropdown
+    const searchQuery = city;
+    cityInput.value = "";
+    ui.hideDisambiguation();
+
     runSearch(async () => {
-        const results = await searchCity(city);
+        const results = await searchCity(searchQuery);
         // If only one result, return it directly; otherwise return array for disambiguation
         return results.length === 1 ? results[0] : results;
     });
@@ -177,7 +183,8 @@ searchForm.addEventListener("submit", (event) => {
 cityInput.addEventListener("input", () => cityInput.setCustomValidity(""));
 
 function handleRecentSelect(location) {
-    cityInput.value = location.name;
+    cityInput.value = "";
+    ui.hideDisambiguation();
     runSearch(async () => location);
 }
 
@@ -250,19 +257,63 @@ themeToggle.addEventListener("click", () => {
 
 
 // =========================
+// Geolocation
+// =========================
+
+/**
+ * Request browser geolocation once and load weather for that location.
+ * Falls back silently if denied or unavailable.
+ */
+async function tryGeolocation() {
+    if (!navigator.geolocation) {
+        return false;
+    }
+
+    return new Promise((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                try {
+                    const { latitude, longitude } = position.coords;
+                    const location = await reverseGeocode({ latitude, longitude });
+                    
+                    // Load weather for the geolocated position
+                    runSearch(async () => location);
+                    resolve(true);
+                } catch (error) {
+                    console.error("Geolocation reverse geocode failed:", error);
+                    resolve(false);
+                }
+            },
+            (error) => {
+                console.log("Geolocation denied or unavailable:", error.message);
+                resolve(false);
+            },
+            { timeout: 10000, enableHighAccuracy: false }
+        );
+    });
+}
+
+
+// =========================
 // Start-up
 // =========================
 
-ui.setMode(currentMode);
-ui.setActiveUnit(currentUnit);
-ui.setActiveTab(currentTab);
+async function initialize() {
+    ui.setMode(currentMode);
+    ui.setActiveUnit(currentUnit);
+    ui.setActiveTab(currentTab);
 
-const recentSearches = storage.getRecentSearches();
-recentState = { list: recentSearches, conditions: [] };
-ui.renderRecent(recentSearches, handleRecentSelect);
+    const recentSearches = storage.getRecentSearches();
+    recentState = { list: recentSearches, conditions: [] };
+    ui.renderRecent(recentSearches, handleRecentSelect);
 
-// Reopen on the last city searched, so a refresh doesn't empty the dashboard.
-// (Delete these 3 lines if you'd rather start on the empty "Search for a city" screen.)
-if (recentSearches.length > 0) {
-    handleRecentSelect(recentSearches[0]);
+    // Try geolocation first, fall back to last recent search if denied/unavailable
+    const geolocated = await tryGeolocation();
+
+    if (!geolocated && recentSearches.length > 0) {
+        // Reopen on the last city searched if geolocation failed
+        handleRecentSelect(recentSearches[0]);
+    }
 }
+
+initialize();
