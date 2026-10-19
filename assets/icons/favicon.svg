@@ -1,0 +1,79 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <!-- Light sky-blue background -->
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E5F7FF"/>
+      <stop offset="100%" stop-color="#BDE8FA"/>
+    </linearGradient>
+
+    <!-- Warm golden sunlight -->
+    <linearGradient id="sun" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#FFE66B"/>
+      <stop offset="100%" stop-color="#FFC928"/>
+    </linearGradient>
+
+    <!-- More pronounced blue cloud -->
+    <linearGradient id="cloud" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#A9E5F5"/>
+      <stop offset="100%" stop-color="#79CDE8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded sky background -->
+  <rect width="64" height="64" rx="15" fill="url(#sky)"/>
+
+  <!-- Sun rays -->
+  <g stroke="#FFD52A" stroke-width="2.8" stroke-linecap="round">
+    <path d="M32 5.5v4.5"/>
+    <path d="M17.7 11.4l3.2 3.2"/>
+    <path d="M46.3 11.4l-3.2 3.2"/>
+    <path d="M11 25h4.5"/>
+    <path d="M48.5 25H53"/>
+  </g>
+
+  <!-- Sun -->
+  <circle cx="32" cy="25" r="13" fill="url(#sun)"/>
+
+  <!-- Distinct light-blue cloud -->
+  <path
+    d="M15.5 47.5
+       C8.5 47.5 5 43 5 37.8
+       C5 32.3 9.2 28.3 15 28.3
+       C16.2 21.2 21.8 17.2 27.7 18.2
+       C32.5 19 35.9 22.7 36.8 27.3
+       C38.3 26.4 40.1 25.9 42 25.9
+       C48.1 25.9 52.3 30.3 52.3 35.6
+       C56.7 36.1 59 38.9 59 42.3
+       C59 45.6 56.3 48.1 52.3 48.1
+       H15.5Z"
+    fill="url(#cloud)"
+    stroke="#73C5E1"
+    stroke-width="0.6"
+    stroke-linejoin="round"/>
+
+  <!-- Golden lightning bolt -->
+  <path
+    d="M32.5 29.5
+       L22.5 41
+       H30.3
+       L27.8 51.5
+       L41 36.8
+       H33.2
+       L36.3 29.5Z"
+    fill="#FFD02F"
+    stroke="#DDA51A"
+    stroke-width="0.9"
+    stroke-linejoin="round"/>
+
+  <!-- Clearly visible blue drizzle -->
+  <g
+    stroke="#159FE0"
+    stroke-width="3.5"
+    stroke-linecap="round">
+    <path d="M17.8 53.5l-2.9 5.5"/>
+    <path d="M29.5 53.5l-2.9 5.5"/>
+    <path d="M41.2 53.5l-2.9 5.5"/>
+    <path d="M52.3 53.5l-2.9 5.5"/>
+  </g>
+</svg>

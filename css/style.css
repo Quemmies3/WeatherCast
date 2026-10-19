@@ -215,8 +215,8 @@ body[data-theme="storm"]  { --bg-image: var(--grad-storm); }
 }
 
 .brand-icon {
-    width: 36px;
-    height: 36px;
+    width: 45px;
+    height: 45px;
     flex-shrink: 0;
 }
 
