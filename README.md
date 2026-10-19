@@ -1,7 +1,5 @@
 # WeatherCast 🌤️
 
-> 🚧 **Status: In Development**
-
 A responsive weather dashboard providing real-time weather conditions and 5-day forecasts for locations worldwide.
 
 ## Tech Stack
@@ -118,3 +116,9 @@ API modules should not directly manipulate the DOM, and UI modules should not ma
 ## Repository
 
 https://github.com/Quemmies3/WeatherCast
+
+
+### Attributions
+
+- Weather data: [Open-Meteo](https://open-meteo.com/) ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))
+- Weather icons: [Meteocons](https://meteocons.com/)

@@ -1,7 +1,7 @@
 // app.js
 // Coordinates the app: connects the form and buttons to api, weather, storage and ui.
 
-import { searchCity, fetchWeather, fetchOtherCities, reverseGeocode, CityNotFoundError, ApiError } from "./api.js";
+import { searchCity, fetchWeather, fetchOtherCities, CityNotFoundError, ApiError } from "./api.js";
 import { buildWeatherData, parseOtherCities } from "./weather.js";
 import * as storage from "./storage.js";
 import * as ui from "./ui.js";
@@ -16,7 +16,7 @@ const viewTabs = document.querySelector(".view-tabs");
 const TABS = ["today", "tomorrow", "week"]; // left to right, as on the page
 
 let currentUnit = storage.getUnit();
-let currentTab = "week";   // the forecast view: "today" | "tomorrow" | "week" (next 5 days)
+let currentTab = "today";   // the forecast view: "today" | "tomorrow" | "week" (next 5 days)
 let currentMode = storage.getMode();
 let lastWeather = null;   // most recent clean weather data, used to redraw when the unit changes
 let latestRequest = 0;    // lets us ignore slow responses from older searches

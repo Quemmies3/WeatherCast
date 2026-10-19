@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WeatherCast</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
 
   <!-- Applies the saved light/dark mode before the page paints, so there is no flash. -->
   <script>
@@ -24,7 +25,7 @@
     <header class="header">
 
         <div class="logo">
-            <img class="brand-icon" src="assets/icons/partly-cloudy-day.svg" alt="" width="44" height="44">
+            <img class="brand-icon" src="assets/icons/partly-cloudy-day.svg" alt="" width="50" height="50">
             <span>WeatherCast</span>
         </div>
 
@@ -92,9 +93,9 @@
 
             <!-- Forecast view: the buttons switch what the cards below show -->
             <div class="view-tabs" role="tablist" aria-label="Forecast range">
-                <button class="view-tab" type="button" role="tab" data-tab="today" aria-selected="false" tabindex="-1">Today</button>
+                <button class="view-tab" type="button" role="tab" data-tab="today" aria-selected="true">Today</button>
                 <button class="view-tab" type="button" role="tab" data-tab="tomorrow" aria-selected="false" tabindex="-1">Tomorrow</button>
-                <button class="view-tab" type="button" role="tab" data-tab="week" aria-selected="true">Next 5 days</button>
+                <button class="view-tab" type="button" role="tab" data-tab="week" aria-selected="false" tabindex="-1">Next 5 days</button>
             </div>
 
             <section id="current-weather" aria-label="Current weather">
